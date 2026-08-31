@@ -9,8 +9,9 @@ def GuardarPrecioEntrada (Precio,Precios=[]):
     return Precios
 def Menu ():
     print("1-Ver espectaculos")
-    print("2-Comprar tickets")
-    print("3-Ver clientes")
+    print("2-Ingresar Espectaculo")
+    print("3-Comprar tickets")
+    print("4-Ver clientes")
     
     return
 def VerificarFormatoFecha(DiaD,MesM,AñoA):
@@ -71,14 +72,15 @@ Fechas_Espectaculos = []
 seguir = "Si"
 while seguir != "No":
     Menu() 
-    precioEntrada = float(input("Ingresar precio: "))
-    Dia = int(input("Ingrese dia de 1 a 31:"))
-    Mes = int(input("Ingrese mes del 1 al 12:"))
-    Año = int(input("Ingrese año del 2026 en adelante:"))
     Opcion = int(input("Ingresar una opcion"))
+    if Opcion == 2:
+        Dia = int(input("Ingrese dia de 1 a 31:"))
+        Mes = int(input("Ingrese mes del 1 al 12:"))
+        Año = int(input("Ingrese año del 2026 en adelante:"))
+        VerificarFormatoFecha(Dia,Mes,Año)
+    precioEntrada = float(input("Ingresar precio: "))
     GuardarPrecioEntrada(precioEntrada,ListadePreciosdeEntradas)
     GuardarFechaEspectaculo(Dia,Mes,Año,Fechas_Espectaculos)
-    VerificarFormatoFecha(Dia,Mes,Año)
     seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir:")
     if seguir == "Si":
         print("Continuamos")

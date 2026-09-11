@@ -1,27 +1,15 @@
 #Sistema de Venta de entradas para Espectaculos
 
-#Listas 
-Clientes = []
-ListadePreciosdeEntradas = [] 
-Lista_EspectaculosEspectaculos = [] 
-Fechas_Espectaculos = []
-
-#Variables Globales
-seguir = "Si"
-
-#Contadores/Acumuladores
-DiaValido = 0
-
 #FUNCIONES
 def Menu ():
-    print("-------------- MENU --------------")
-    print("  1-Ver espectaculos")
-    print("  2-Ingresar Espectaculo")
-    print("  3-Ingresar precio de la entrada")
-    print("  4-Comprar tickets de entrada")
-    print("  5-Ingresar Cliente")
-    print("  6-Ver Clientes")
-    print("--------------------------------------")
+    print("================= MENU =================")
+    print("  1 - Ver espectaculos")
+    print("  2 - Ingresar Espectaculo")
+    print("  3 - Comprar tickets de entrada")
+    print("  4 - Ingresar Cliente")
+    print("  5 - Ver Clientes")
+    print("  6 - Salir")
+    print("======================================")
     return
 
 def VerEspectaculos(Espectaculos,FechaEspectaculos):
@@ -52,7 +40,7 @@ def VerificarFormatoFecha(DiaD,MesM,AñoA):
     else:
         max_dias = 31
     while DiaD < 1 or DiaD > max_dias:
-        DiaD = int(input("Dia invalido, ingresar un dia entre 1 y" + str(max_dias) + ": "))
+        DiaD = int(input("Dia invalido, ingresar un dia entre 1 y " + str(max_dias) + ": "))
     return DiaD, MesM, AñoA
 
 def GuardarFechaEspectaculo (DiaD,MesM,AñoA,Espectaculos=[]):
@@ -78,10 +66,41 @@ def ContinuarPrograma(seguir):
         print("Continuamos")
         return "Si"
 
+def rellenarmatriz(matriz):
+    filas = len(matriz)
+    columnas = len(matriz[0])
+    for f in range(filas):
+        for c in range(columnas):
+            matriz[f][c] = 0
+
+def imprimirmatriz(matriz):
+    filas = len(matriz)
+    columnas = len(matriz[0])
+    for f in range(filas):
+        for c in range(columnas):
+            print("%6d" %matriz[f][c], end="")
+        print()
+
+#Listas 
+Clientes = []
+ListadePreciosdeEntradas = [] 
+Lista_EspectaculosEspectaculos = [] 
+Fechas_Espectaculos = []
+
+#Matrices
+filas = 10
+columnas = 10
+asientos = [[0 for c in range(columnas)] for f in range(filas)]
+
+#Variables Globales
+seguir = "Si"
+
 #MAIN
+rellenarmatriz(asientos)
 while seguir != "No":
-    Menu() 
+    Menu()
     Opcion = int(input("Ingresar una opcion: "))
+    print("--------------------------------------------------------------------")
     while Opcion > 6 or Opcion < 1:
         Menu()
         Opcion=int(input("Error. La opcion ingresada no existe, intente de nuevo: "))
@@ -97,14 +116,48 @@ while seguir != "No":
         Dia, Mes, Año =VerificarFormatoFecha(Dia,Mes,Año)
         GuardarFechaEspectaculo(Dia,Mes,Año,Fechas_Espectaculos)
     if Opcion == 3:
-        precioEntrada = float(input("Ingresar precio: "))
-        GuardarPrecioEntrada(precioEntrada,ListadePreciosdeEntradas)
+        print("A continuacion se mostrara los asientos disponibles en el estadio para comprar su entrada:")
+        print("--------------------------------------------------------------")
+        imprimirmatriz(asientos)
+        print("--------------------------------------------------------------")
+        deseacomprar=input("Desea comprar? (Responda Si o No): ")
+        deseacomprar=ContinuarPrograma(deseacomprar)
+        if deseacomprar == "Si":
+            filacomprar=int(input("¿En que fila desea comprar su asiento?: "))
+            while filacomprar > 10 or filacomprar < 0:
+                filacomprar=int(input("Error. Ingrese un valor de fila correcto (entre 1 y 10)"))
+            columnacomprar=int(input("¿En que columna desea comprar su asiento?: "))
+            while columnacomprar > 10 or columnacomprar < 0:
+                columnacomprar=int(input("Error. Ingrese un valor de columna correcto (entre 1 y 10)"))
+            print("--------------------------------------------------------------------")
+            filacomprar=filacomprar-1
+            columnacomprar=columnacomprar-1
+            if asientos[filacomprar][columnacomprar] == 1:
+                while asientos[filacomprar][columnacomprar] == 1:
+                    print("Error. La entrada que desea comprar ya ha sido vendida, Pruebe con otra")
+                    filacomprar=int(input("¿En que fila desea comprar su asiento?: "))
+                    while filacomprar > 10 or filacomprar < 1:
+                        filacomprar=int(input("Error. Ingrese un valor de fila correcto (entre 1 y 10)"))
+                    columnacomprar=int(input("¿En que columna desea comprar su asiento?: "))
+                    while columnacomprar > 10 or columnacomprar < 1:
+                        columnacomprar=int(input("Error. Ingrese un valor de columna correcto (entre 1 y 10)"))
+                        print("--------------------------------------------------------------------")
+            else:
+                print("El precio de la entrada es de $200.000 pesos argentinos")
+                deseacomprar=input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
+                ContinuarPrograma(deseacomprar)
+                if deseacomprar == "Si":
+                    asientos[filacomprar][columnacomprar]=1
+                    imprimirmatriz(asientos)
     if Opcion == 4:
-        pass
-    if Opcion == 5:
         cliente = input("Ingrese su nombre y apellido:")
         IngresarClientes(cliente,Clientes)
-    if Opcion == 6:
+    if Opcion == 5:
         pass
-    seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
-    seguir = ContinuarPrograma(seguir)
+    if Opcion == 6:
+        seguir="No"
+        print("Terminando programa...")
+        print("======================================")
+    if Opcion != 6:
+        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
+        seguir = ContinuarPrograma(seguir)

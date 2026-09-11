@@ -13,9 +13,15 @@ def Menu ():
     return
 
 def VerEspectaculos(Espectaculos,FechaEspectaculos):
-    print(Espectaculos[:], sep="/")
-    print(FechaEspectaculos[:], sep="/")
-    return
+    print()
+    print("========== ESPECTACULOS ===========")
+    for i in range(len(Espectaculos)):
+        numero = str(i + 1)
+        print(numero + "- [ " + Espectaculos[i] + " - " + FechaEspectaculos[i] + " ]")
+    if len(Espectaculos) == 0:
+        print("  -No se ingresaron espectaculos")
+    print("===================================")
+    print()
 
 def GuardarEspectaculo(Espec,ListaE):
     ListaE.append(Espec)
@@ -80,6 +86,17 @@ def imprimirmatriz(matriz):
         for c in range(columnas):
             print("%6d" %matriz[f][c], end="")
         print()
+
+def VerClientes (ListaClientes):
+    print()
+    print("===== LISTA DE CLIENTES =====")
+    for i in range(len(ListaClientes)):
+        numero = str(i + 1)
+        print(numero + "- [ " + Clientes[i] + " ]")
+    if len(ListaClientes) == 0:
+        print(" -No se encontraron clientes")
+    print("=============================")
+    print()
 
 #Listas 
 Clientes = []
@@ -153,11 +170,11 @@ while seguir != "No":
         cliente = input("Ingrese su nombre y apellido:")
         IngresarClientes(cliente,Clientes)
     if Opcion == 5:
-        pass
+        print()
+        VerClientes(Clientes)
     if Opcion == 6:
         seguir="No"
         print("Terminando programa...")
         print("======================================")
-    if Opcion != 6:
-        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
-        seguir = ContinuarPrograma(seguir)
+    
+    

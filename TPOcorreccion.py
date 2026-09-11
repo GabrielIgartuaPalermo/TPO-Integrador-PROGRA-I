@@ -68,13 +68,6 @@ def ContinuarPrograma(seguir):
         seguir="Si"
         return seguir
 
-def rellenarmatriz(matriz):
-    filas = len(matriz)
-    columnas = len(matriz[0])
-    for f in range(filas):
-        for c in range(columnas):
-            matriz[f][c] = 0
-
 def imprimirmatriz(matriz):
     filas = len(matriz)
     columnas = len(matriz[0])
@@ -176,7 +169,7 @@ while seguir != "No":
         IngresarClientes(cliente,Clientes)
     if Opcion == 5:
         print()
-        VerClientes(Cientes)
+        VerClientes(Clientes)
     if Opcion == 6:
         seguir="No"
         print("Terminando programa...")

@@ -5,7 +5,8 @@ import random
 Clientes = []
 ListadePreciosdeEntradas = [] 
 Lista_EspectaculosEspectaculos = [] 
-Fechas_Espectaculos = [] 
+Fechas_Espectaculos = []
+L_Stock = [] 
 #Matriz 
 matrizsinuso =       [[0, 0, 0],
                       [0, 0, 0],
@@ -21,6 +22,7 @@ seguir = "Si"
 #FUNCIONES
 #MENU
 def Menu():
+    print("================= MENU =================")
     print("1 - Ver espectaculos")
     print("2 - Agregar espectaculo")
     print("3 - Comprar Entrada")
@@ -28,25 +30,35 @@ def Menu():
     print("5 - Ver clientes")
     print("6 - Buscar espectaculo")
     print("7 - Ver ventas")
-    print("8 - Salir")
+    print(" - Salir")
+    print("======================================")
     
 #Funciones de Carga
 def IngresarClientes(Cliente,ListaClientes):
-    ListaClientes.append(Cliente)
+    for C, elem in enumerate(ListaClientes):
+        ListaClientes[C].append(Cliente)
     return  
 
+def GuardarStock(ListaStocks,ListaEspec):
+    for S,Nstock in enumerate(ListaStocks):
+        if ListaEspec != []:
+            ListaStocks[S].append(1)
+
 def GuardarEspectaculo(Espec,ListaE):
-    ListaE.append(Espec)
-    return ListaE
+    for e, elementos in enumerate(ListaE):
+        ListaE(e).append(Espec)
+        return 
 
 def GuardarPrecioEntrada(Precio,Precios=[]):
-    Precios.append(Precio)
-    return Precios
+    for P, elem in enumerate(Precios):
+        Precios.append(Precio)
+    return 
 
 def GuardarFechaEspectaculo(DiaD,MesM,AñoA,Espectaculos=[]):
-    fecha = Armar_Fecha_Completa(DiaD, MesM, AñoA)
-    Espectaculos.append(fecha)
-    return Espectaculos
+    for F, fecha in enumerate(Espectaculos):
+        fecha = Armar_Fecha_Completa(DiaD, MesM, AñoA)
+        Espectaculos[F].append(fecha)
+    return
 #FUNCIONES DE VALIDACION
 def VerificarFormatoFecha(DiaD,MesM,AñoA):
     while AñoA < 2026:
@@ -72,7 +84,6 @@ def Armar_Fecha_Completa(d, m, a):
 #Funciones de compra
 
 #Funciones de Consulta
-
 def VerVentas():
     pass
 def VerEspectaculos(Espectaculos,FechaEspectaculos):
@@ -84,15 +95,15 @@ def BuscarEspectaculo(ShowsList,Busqueda):
     while contadorENC != 0:
         for SHOW in ShowsList:
             if Busqueda == SHOW:
-                print("Se ha encontrado el espectaculo")
+                print(f"Se ha encontrado el espectaculo: {SHOW}")
                 contadorENC = 1
-                return print(Busqueda)
+                return 
             else:
                 print("No se ha encontrado")
-                return print("No se ha encontrado el espectaculo")
+                return 
 def VerClientes(CL):
     for CLIENT in CL:
-        print(CL)
+        print(CLIENT)
     return 
 #Otras funciones
 def ContinuarPrograma(seguir):
@@ -124,6 +135,7 @@ while seguir != "No":
     if Opcion == 2:
         Espectaculo = input("Ingresar un espectaculo:")
         GuardarEspectaculo(Espectaculo,Lista_EspectaculosEspectaculos)
+        GuardarStock(L_Stock,Lista_EspectaculosEspectaculos)
         print("A continuacion ingresar en formato D/M/A la fecha")
         Dia = int(input("Ingrese dia de 1 a 31:"))
         Mes = int(input("Ingrese mes del 1 al 12:"))

@@ -25,11 +25,9 @@ def VerEspectaculos(Espectaculos,FechaEspectaculos):
 
 def GuardarEspectaculo(Espec,ListaE):
     ListaE.append(Espec)
-    return ListaE
 
 def GuardarPrecioEntrada (Precio,Precios=[]):
     Precios.append(Precio)
-    return Precios
 
 def VerificarFormatoFecha(DiaD,MesM,AñoA):
     while AñoA < 2026:
@@ -52,25 +50,23 @@ def VerificarFormatoFecha(DiaD,MesM,AñoA):
 def GuardarFechaEspectaculo (DiaD,MesM,AñoA,Espectaculos=[]):
     fecha = Armar_Fecha_Completa(DiaD, MesM, AñoA)
     Espectaculos.append(fecha)
-    return Espectaculos
 
 def Armar_Fecha_Completa(d, m, a):
     return "/".join(map(str, (d, m, a)))
 
 def IngresarClientes (Cliente,ListaClientes):
     ListaClientes.append(Cliente)
-    return
 
 def ContinuarPrograma(seguir):
     while (seguir != "No" and seguir != "no" and seguir != "NO" and
            seguir != "Si" and seguir != "si" and seguir != "SI"):
         seguir = input('Error. La respuesta no es ni "Si" ni "No", Intente de nuevo: ')
     if seguir == "No" or seguir == "no" or seguir == "NO":
-        print("Terminando programa...")
-        return "No"
+        seguir="No"
+        return seguir
     else:
-        print("Continuamos")
-        return "Si"
+        seguir="Si"
+        return seguir
 
 def rellenarmatriz(matriz):
     filas = len(matriz)
@@ -86,7 +82,7 @@ def imprimirmatriz(matriz):
         for c in range(columnas):
             print("%6d" %matriz[f][c], end="")
         print()
-
+        
 def VerClientes (ListaClientes):
     print()
     print("===== LISTA DE CLIENTES =====")
@@ -103,17 +99,12 @@ Clientes = []
 ListadePreciosdeEntradas = [] 
 Lista_EspectaculosEspectaculos = [] 
 Fechas_Espectaculos = []
-
-#Matrices
-filas = 10
-columnas = 10
-asientos = [[0 for c in range(columnas)] for f in range(filas)]
+Lista_De_Asientos=[]
 
 #Variables Globales
 seguir = "Si"
 
 #MAIN
-rellenarmatriz(asientos)
 while seguir != "No":
     Menu()
     Opcion = int(input("Ingresar una opcion: "))
@@ -124,61 +115,72 @@ while seguir != "No":
     if Opcion == 1: 
         VerEspectaculos(Lista_EspectaculosEspectaculos,Fechas_Espectaculos)
     if Opcion == 2:
-        print()
-        print("============ INGRESAR ESPECTACULO ============")
-        Espectaculo = input("Ingresar un espectaculo: ")
-        GuardarEspectaculo(Espectaculo, Lista_EspectaculosEspectaculos)
-        print("Acontinuacion ingresar en formato D/M/A la fecha")
+        Espectaculo = input("Ingresar un espectaculo:")
+        GuardarEspectaculo(Espectaculo,Lista_EspectaculosEspectaculos)
+        nueva_matriz = [[0 for c in range(10)] for f in range(10)]
+        Lista_De_Asientos.append(nueva_matriz)
+        print("A continuacion ingresar en formato D/M/A la fecha")
         Dia = int(input("Ingrese dia de 1 a 31: "))
         Mes = int(input("Ingrese mes del 1 al 12: "))
         Año = int(input("Ingrese año del 2026 en adelante: "))
-        print("==============================================")
-        print()
-        VerificarFormatoFecha(Dia, Mes, Año)
-        GuardarFechaEspectaculo(Dia, Mes, Año, Fechas_Espectaculos)
+        Dia, Mes, Año =VerificarFormatoFecha(Dia,Mes,Año)
+        GuardarFechaEspectaculo(Dia,Mes,Año,Fechas_Espectaculos)
     if Opcion == 3:
-        print("A continuacion se mostrara los asientos disponibles en el estadio para comprar su entrada:")
-        print("--------------------------------------------------------------")
-        imprimirmatriz(asientos)
-        print("--------------------------------------------------------------")
-        deseacomprar=input("Desea comprar? (Responda Si o No): ")
-        deseacomprar=ContinuarPrograma(deseacomprar)
-        if deseacomprar == "Si":
-            filacomprar=int(input("¿En que fila desea comprar su asiento?: "))
-            while filacomprar > 10 or filacomprar < 0:
-                filacomprar=int(input("Error. Ingrese un valor de fila correcto (entre 1 y 10)"))
-            columnacomprar=int(input("¿En que columna desea comprar su asiento?: "))
-            while columnacomprar > 10 or columnacomprar < 0:
-                columnacomprar=int(input("Error. Ingrese un valor de columna correcto (entre 1 y 10)"))
-            print("--------------------------------------------------------------------")
-            filacomprar=filacomprar-1
-            columnacomprar=columnacomprar-1
-            if asientos[filacomprar][columnacomprar] == 1:
+        if len(Lista_EspectaculosEspectaculos) == 0:
+            print("  -No se ingresaron espectaculos")
+            print("===================================")
+        else:
+            print("Espectaculos disponibles:")
+            for i in range(len(Lista_EspectaculosEspectaculos)):
+                print(i + 1, "-", Lista_EspectaculosEspectaculos[i])
+            num_esp = int(input("Seleccione el numero de espectaculo que desea ver: "))
+            while num_esp < 1 or num_esp > len(Lista_EspectaculosEspectaculos):
+                num_esp = int(input("Error. Seleccione un numero valido de la lista: "))
+            indice_espectaculo = num_esp - 1
+            asientos = Lista_De_Asientos[indice_espectaculo]
+            print("A continuacion se mostrara los asientos disponibles en el estadio para comprar su entrada:")
+            print("--------------------------------------------------------------")
+            imprimirmatriz(asientos)
+            print("--------------------------------------------------------------")
+            deseacomprar=input("Desea comprar? (Responda Si o No): ")
+            deseacomprar=ContinuarPrograma(deseacomprar)
+            if deseacomprar == "Si":
+                filacomprar=int(input("¿En que fila desea comprar su asiento?: "))
+                while filacomprar > 10 or filacomprar < 1:
+                    filacomprar=int(input("Error. Ingrese un valor de fila correcto (entre 1 y 10)"))
+                columnacomprar=int(input("¿En que columna desea comprar su asiento?: "))
+                while columnacomprar > 10 or columnacomprar < 1:
+                    columnacomprar=int(input("Error. Ingrese un valor de columna correcto (entre 1 y 10)"))
+                print("--------------------------------------------------------------------")
+                filacomprar=filacomprar-1
+                columnacomprar=columnacomprar-1
                 while asientos[filacomprar][columnacomprar] == 1:
                     print("Error. La entrada que desea comprar ya ha sido vendida, Pruebe con otra")
                     filacomprar=int(input("¿En que fila desea comprar su asiento?: "))
                     while filacomprar > 10 or filacomprar < 1:
                         filacomprar=int(input("Error. Ingrese un valor de fila correcto (entre 1 y 10)"))
+                        filacomprar=filacomprar-1
                     columnacomprar=int(input("¿En que columna desea comprar su asiento?: "))
                     while columnacomprar > 10 or columnacomprar < 1:
                         columnacomprar=int(input("Error. Ingrese un valor de columna correcto (entre 1 y 10)"))
-                        print("--------------------------------------------------------------------")
-            else:
-                print("El precio de la entrada es de $200.000 pesos argentinos")
-                deseacomprar=input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
-                ContinuarPrograma(deseacomprar)
-                if deseacomprar == "Si":
-                    asientos[filacomprar][columnacomprar]=1
-                    imprimirmatriz(asientos)
+                    print("--------------------------------------------------------------------")
+                    columnacomprar=columnacomprar-1
+                if asientos[filacomprar][columnacomprar] == 0:
+                    print("El precio de la entrada es de $200.000 pesos argentinos")
+                    deseacomprar=input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
+                    deseacomprar=ContinuarPrograma(deseacomprar)
+                    if deseacomprar == "Si":
+                        asientos[filacomprar][columnacomprar]=1
     if Opcion == 4:
         cliente = input("Ingrese su nombre y apellido:")
         IngresarClientes(cliente,Clientes)
     if Opcion == 5:
         print()
-        VerClientes(Clientes)
+        VerClientes(Cientes)
     if Opcion == 6:
         seguir="No"
         print("Terminando programa...")
         print("======================================")
-    
-    
+    if Opcion != 6:
+        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
+        seguir = ContinuarPrograma(seguir)

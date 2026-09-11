@@ -124,14 +124,18 @@ while seguir != "No":
     if Opcion == 1: 
         VerEspectaculos(Lista_EspectaculosEspectaculos,Fechas_Espectaculos)
     if Opcion == 2:
-        Espectaculo = input("Ingresar un espectaculo:")
-        GuardarEspectaculo(Espectaculo,Lista_EspectaculosEspectaculos)
-        print("A continuacion ingresar en formato D/M/A la fecha")
+        print()
+        print("============ INGRESAR ESPECTACULO ============")
+        Espectaculo = input("Ingresar un espectaculo: ")
+        GuardarEspectaculo(Espectaculo, Lista_EspectaculosEspectaculos)
+        print("Acontinuacion ingresar en formato D/M/A la fecha")
         Dia = int(input("Ingrese dia de 1 a 31: "))
         Mes = int(input("Ingrese mes del 1 al 12: "))
         Año = int(input("Ingrese año del 2026 en adelante: "))
-        Dia, Mes, Año =VerificarFormatoFecha(Dia,Mes,Año)
-        GuardarFechaEspectaculo(Dia,Mes,Año,Fechas_Espectaculos)
+        print("==============================================")
+        print()
+        VerificarFormatoFecha(Dia, Mes, Año)
+        GuardarFechaEspectaculo(Dia, Mes, Año, Fechas_Espectaculos)
     if Opcion == 3:
         print("A continuacion se mostrara los asientos disponibles en el estadio para comprar su entrada:")
         print("--------------------------------------------------------------")

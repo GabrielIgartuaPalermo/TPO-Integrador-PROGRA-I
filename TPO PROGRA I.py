@@ -23,16 +23,15 @@ seguir = "Si"
 def Menu():
     print("1 - Ver espectaculos")
     print("2 - Agregar espectaculo")
-    print("3 - Comprar entradas")
+    print("3 - Comprar Entrada")
     print("4 - Registrar cliente")
     print("5 - Ver clientes")
     print("6 - Buscar espectaculo")
     print("7 - Ver ventas")
-    print("8 - Guardar datos en archivo")
-    print("9 - Cargar datos desde archivo")
-    print("10 - Salir")
+    print("8 - Salir")
+    
 #Funciones de Carga
-def IngresarClientes (Cliente,ListaClientes):
+def IngresarClientes(Cliente,ListaClientes):
     ListaClientes.append(Cliente)
     return  
 
@@ -40,11 +39,11 @@ def GuardarEspectaculo(Espec,ListaE):
     ListaE.append(Espec)
     return ListaE
 
-def GuardarPrecioEntrada (Precio,Precios=[]):
+def GuardarPrecioEntrada(Precio,Precios=[]):
     Precios.append(Precio)
     return Precios
 
-def GuardarFechaEspectaculo (DiaD,MesM,AñoA,Espectaculos=[]):
+def GuardarFechaEspectaculo(DiaD,MesM,AñoA,Espectaculos=[]):
     fecha = Armar_Fecha_Completa(DiaD, MesM, AñoA)
     Espectaculos.append(fecha)
     return Espectaculos
@@ -73,6 +72,9 @@ def Armar_Fecha_Completa(d, m, a):
 #Funciones de compra
 
 #Funciones de Consulta
+
+def VerVentas():
+    pass
 def VerEspectaculos(Espectaculos,FechaEspectaculos):
     print(Espectaculos[:], sep="/")
     print(FechaEspectaculos[:], sep="/")
@@ -84,7 +86,7 @@ def BuscarEspectaculo(ShowsList,Busqueda):
             if Busqueda == SHOW:
                 print("Se ha encontrado el espectaculo")
                 contadorENC = 1
-                return Busqueda
+                return print(Busqueda)
             else:
                 print("No se ha encontrado")
                 return print("No se ha encontrado el espectaculo")
@@ -103,6 +105,15 @@ def ContinuarPrograma(seguir):
     else:
         print("Continuamos")
         return "Si"
+
+def ComprarEntradas(ListaE,ENTRADAC):
+    for ENTRADAS in ListaE:
+        if ENTRADAC in ENTRADAS:
+            print("Entrada encontrada")
+            ListaE[ENTRADAS].remove(ENTRADAC)
+        else:
+            print("No se ha encontrado el valor")
+    return
 #Funciones de archivo
 #MAIN
 while seguir != "No":
@@ -119,9 +130,13 @@ while seguir != "No":
         Año = int(input("Ingrese año del 2026 en adelante:"))
         VerificarFormatoFecha(Dia,Mes,Año)
         GuardarFechaEspectaculo(Dia,Mes,Año,Fechas_Espectaculos)
-    if Opcion == 3:
         precioEntrada = float(input("Ingresar precio: "))
         GuardarPrecioEntrada(precioEntrada,ListadePreciosdeEntradas)
+    if Opcion == 3:
+        print("Espectaculos disponibles:")
+        VerEspectaculos(Lista_EspectaculosEspectaculos,Fechas_Espectaculos)
+        CEntrada = input("Ingresar espectaculo a comprar")
+        ComprarEntradas(Lista_EspectaculosEspectaculos,CEntrada)
     if Opcion == 4:
         cliente = input("Ingrese su nombre y apellido:")
         IngresarClientes(cliente,Clientes)
@@ -130,5 +145,8 @@ while seguir != "No":
     if Opcion == 6:
         EspectaculoB = input("Ingrese el espectaculo que quiere buscar:")
         BuscarEspectaculo(Lista_EspectaculosEspectaculos,EspectaculoB)
-    seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir:")
-    seguir = ContinuarPrograma(seguir)
+    if Opcion == 7:
+        pass
+    if Opcion == 8:
+        seguir = input("¿Estas Seguro que deseas salir?:")
+        seguir = ContinuarPrograma(seguir)

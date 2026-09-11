@@ -117,13 +117,13 @@ def ContinuarPrograma(seguir):
         print("Continuamos")
         return "Si"
 
-def ComprarEntradas(ListaE,ENTRADAC):
-    for ENTRADAS in ListaE:
-        if ENTRADAC in ENTRADAS:
-            print("Entrada encontrada")
-            ListaE[ENTRADAS].remove(ENTRADAC)
-        else:
-            print("No se ha encontrado el valor")
+def ComprarEntradas(ListaE,ENTRADAC,Lista_Stock):
+    for E, ENTRADAS in enumerate(ListaE):
+        for S, STOCK in enumerate(Lista_Stock):
+            if Lista_Stock[E] != 0:
+                Lista_Stock[E] - 1
+            else:
+                print("No quedan entradas para el espectaculo")
     return
 #Funciones de archivo
 #MAIN
@@ -148,7 +148,7 @@ while seguir != "No":
         print("Espectaculos disponibles:")
         VerEspectaculos(Lista_EspectaculosEspectaculos,Fechas_Espectaculos)
         CEntrada = input("Ingresar espectaculo a comprar")
-        ComprarEntradas(Lista_EspectaculosEspectaculos,CEntrada)
+        ComprarEntradas(Lista_EspectaculosEspectaculos,CEntrada,L_Stock)
     if Opcion == 4:
         cliente = input("Ingrese su nombre y apellido:")
         IngresarClientes(cliente,Clientes)

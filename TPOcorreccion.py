@@ -207,6 +207,7 @@ while seguir != "No":
         cliente = input("Ingrese su nombre y apellido:")
         while cliente.strip() == "": 
             cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
+        cliente=cliente.title()
         Clientes.append(cliente)
     if opcion == 5:
         print()

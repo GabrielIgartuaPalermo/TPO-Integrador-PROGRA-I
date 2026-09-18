@@ -30,10 +30,42 @@ def Menu():
     print("5 - Ver clientes")
     print("6 - Buscar espectaculo")
     print("7 - Ver ventas")
+    print("8 - Modificar Espectaculo")
     print(" - Salir")
     print("======================================")
     
 #Funciones de Carga
+def modificar_espectaculo(LE,LF,LS,LP,ESPEC):
+    for indice, espec in enumerate(LE):
+        if ESPEC in LE:
+            print("Espectaculo encontrado")
+            deseo = input("Que deseas cambiar?:").lower
+            if deseo == "precio":
+                for p in range(len(LP)):
+                    if p == indice:
+                        precionuevo = float(input("Ingrese el precio nuevo que desea que tenga el espectaculo:"))
+                        LP[p].append(precionuevo)
+            elif deseo == "stock":
+                for s in range(len(LS)):
+                    if s == indice:
+                        STOCK = int(input("Ingrese el STOCK nuevo:"))
+                        LS[s].append(STOCK)
+            elif deseo == "nombre":
+                for N in range(len(LE)):
+                    if N == indice:
+                        nombrenuevo = input("Ingrese el nombre nuevo para el espectaculo:")
+                        LE[N].append(nombrenuevo) 
+            elif deseo == "fecha":
+                for f in range(len(LF)):
+                    if f == indice:
+                        d = int(input("Ingrese dia:"))
+                        m = int(input("Ingrese el mes:"))
+                        a = int(input("Ingrese el año:"))
+                        VerificarFormatoFecha(d,m,a)
+                        Armar_Fecha_Completa(d,m,a)
+                        LF[f].append(Armar_Fecha_Completa)
+
+
 def IngresarClientes(Cliente,ListaClientes):
     for C, elem in enumerate(ListaClientes):
         ListaClientes[C].append(Cliente)
@@ -162,3 +194,6 @@ while seguir != "No":
     if Opcion == 8:
         seguir = input("¿Estas Seguro que deseas salir?:")
         seguir = ContinuarPrograma(seguir)
+    if Opcion == 9:
+        especmodificado = input("Ingrese el nombre del espectaculo a modificar:")
+        modificar_espectaculo(Lista_EspectaculosEspectaculos,Fechas_Espectaculos,L_Stock,ListadePreciosdeEntradas,especmodificado)

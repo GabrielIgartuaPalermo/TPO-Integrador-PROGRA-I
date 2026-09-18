@@ -211,7 +211,6 @@ while seguir != "No":
         cliente=cliente.title()
         Clientes.append(cliente)
     if opcion == 5:
-        print()
         VerClientes(Clientes)
     if opcion == 6:
         seguir="No"

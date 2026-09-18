@@ -60,7 +60,7 @@ def VerificarFormatoFecha(diad,mesm,añoa):
     else:
         max_dias = 31
     while diad < 1 or diad > max_dias:
-        diad = PedirEntero("Dia invalido, ingresar un dia entre 1 y " + str(max_dias) + ": ")
+        diad = PedirEntero(f"Dia invalido, ingresar un dia entre 1 y {max_dias}: ")
     return diad, mesm, añoa
 
 def Armar_Fecha_Completa(d, m, a):
@@ -95,7 +95,7 @@ def imprimirmatriz(matriz):
 def VerClientes(listaclientes):
     '''Imprime en pantalla la lista de clientes registrados'''
     print()
-    print("===== LISTA DE CLIENTES =====")
+    print("====== LISTA DE CLIENTES ======")
     for i in range(len(listaclientes)):
         numero = str(i + 1)
         print(numero + "- [ " + listaclientes[i] + " ]")
@@ -134,7 +134,7 @@ while seguir != "No":
         espectaculo = input("Ingresar un espectaculo:")
         while espectaculo.strip() == "": 
             espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
-        espectaculo = espectaculo.upper()
+        espectaculo=espectaculo.upper()
         ListaEspectaculosEspectaculos.append(espectaculo)
         nuevamatriz = [[0 for c in range(10)] for f in range(10)]
         ListaDeAsientos.append(nuevamatriz)
@@ -185,7 +185,7 @@ while seguir != "No":
                         columnacomprar = VerificarValorMatriz(columnacomprar)
                         print("--------------------------------------------------------------------")  
                     precioentrada = 110000 - (filacomprar * 5000)
-                    print("El precio de la entrada es de " + str(precioentrada) + " pesos argentinos")
+                    print(f"El precio de la entrada es de {precioentrada} pesos argentinos")
                     deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
                     deseacomprar = ContinuarPrograma(deseacomprar)
                     if deseacomprar == "Si":
@@ -198,7 +198,7 @@ while seguir != "No":
                 else:
                     preciocampo = 75000
                     print("Entradas de campo disponibles: " + str(50 - vendidosactuales) + "/50")
-                    print("El precio de la entrada de Campo es de " + str(preciocampo) + " pesos argentinos.")
+                    print(f"El precio de la entrada de campo es de {preciocampo} pesos argentinos.")
                     deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
                     deseacomprar = ContinuarPrograma(deseacomprar)
                     if deseacomprar == "Si":

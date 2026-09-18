@@ -134,6 +134,7 @@ while seguir != "No":
         espectaculo = input("Ingresar un espectaculo:")
         while espectaculo.strip() == "": 
             espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
+        espectaculo = espectaculo.upper()
         ListaEspectaculosEspectaculos.append(espectaculo)
         nuevamatriz = [[0 for c in range(10)] for f in range(10)]
         ListaDeAsientos.append(nuevamatriz)

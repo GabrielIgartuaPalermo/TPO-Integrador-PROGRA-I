@@ -1,21 +1,6 @@
 #Sistema de Venta de entradas para Espectaculos
-#Modulosw
-import random
-#Listas 
-Clientes = []
-ListadePreciosdeEntradas = [] 
-Lista_EspectaculosEspectaculos = [] 
-Fechas_Espectaculos = []
-L_Stock = [] 
-ListaDeAsientos=[]
-ListaDeCampo=[]
-#Matriz 
-#Variables Globales
-seguir = "Si"
-#Contadores/Acumuladores
 
 #FUNCIONES
-#MENU
 def Menu ():
     '''Muestra el menu principal de opciones en pantalla'''
     print()
@@ -27,32 +12,20 @@ def Menu ():
     print("  5 - Ver Clientes")
     print("  6 - Salir")
     print("========================================")
-    
-#Funciones de Carga
-def GuardarFechaEspectaculo(diad,mesm,añoa,espectaculos):
-    '''Genera la fecha formateada y la guarda en la lista de fechas'''
-    fecha = Armar_Fecha_Completa(diad, mesm, añoa)
-    espectaculos.append(fecha)
 
-#FUNCIONES DE VALIDACION
-def VerificarFormatoFecha(DiaD,MesM,AñoA):
-    '''Valida que el dia, mes y año sean valores correctos y devuelve la fecha valida'''
-    while AñoA < 2026:
-        AñoA = int(input("Error. Ingresar un año que sea 2026 o en adelante: "))
-    while MesM < 1 or MesM > 12:
-        MesM = int(input("Mes invalido, ingresar nuevamente el mes (1-12): "))
-    if MesM == 2:
-        if (AñoA % 4 == 0 and AñoA % 100 != 0) or (AñoA % 400 == 0):
-            max_dias = 29
-        else:
-            max_dias = 28
-    elif MesM == 4 or MesM == 6 or MesM == 9 or MesM == 11:
-        max_dias = 30
-    else:
-        max_dias = 31
-    while DiaD < 1 or DiaD > max_dias:
-        DiaD = int(input("Dia invalido, ingresar un dia entre 1 y" + str(max_dias) + ": "))
-    return DiaD, MesM, AñoA
+def VerEspectaculos(espectaculos,fechaespectaculos):
+    '''Imprime la lista de espectaculos registrados con sus fechas'''
+    print()
+    print("============ ESPECTACULOS =============")
+    for i in range(len(espectaculos)):
+        numero = str(i + 1)
+        print("   ", numero + "- [ " + espectaculos[i] + " - " + fechaespectaculos[i] + " ]")
+    if len(espectaculos) == 0:
+        print()
+        print("                  No se ingresaron espectaculos")
+        print()
+    print("=======================================")
+    print()
 
 def validar_formato(formato):
     '''Verifica que un texto ingrese unicamente caracteres numericos y no este vacio'''
@@ -71,18 +44,45 @@ def PedirEntero(mensaje):
         texto = input("Error. Ingrese unicamente numeros validos: ")
     return int(texto)
 
-def VerificarValorMatriz(valor):
-    '''Valida que el valor ingresado para fila o columna este entre 1 y 10'''
-    while valor > 10 or valor < 1:
-        valor=PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
-    return valor
+def VerificarFormatoFecha(diad,mesm,añoa):
+    '''Valida que el dia, mes y año sean valores correctos y devuelve la fecha valida'''
+    while añoa < 2026:
+        añoa = PedirEntero("Error. Ingresar un año que sea 2026 o en adelante: ")
+    while mesm < 1 or mesm > 12:
+        mesm = PedirEntero("Mes invalido, ingresar nuevamente el mes (1-12): ")
+    if mesm == 2:
+        if (añoa % 4 == 0 and añoa % 100 != 0) or (añoa % 400 == 0):
+            max_dias = 29
+        else:
+            max_dias = 28
+    elif mesm == 4 or mesm == 6 or mesm == 9 or mesm == 11:
+        max_dias = 30
+    else:
+        max_dias = 31
+    while diad < 1 or diad > max_dias:
+        diad = PedirEntero(f"Dia invalido, ingresar un dia entre 1 y {max_dias}: ")
+    return diad, mesm, añoa
 
-#Funciones de Formateo
 def Armar_Fecha_Completa(d, m, a):
     '''Convierte dia mes y año en un texto en formato dia mes año con separadores'''
     return "/".join(map(str, (d, m, a)))
-#Funciones de compra
-#Funciones de Consulta
+
+def GuardarFechaEspectaculo (diad,mesm,añoa,espectaculos):
+    '''Genera la fecha formateada y la guarda en la lista de fechas'''
+    fecha = Armar_Fecha_Completa(diad, mesm, añoa)
+    espectaculos.append(fecha)
+
+def ContinuarPrograma(seguir):
+    '''Valida y normaliza la respuesta del usuario para continuar o no el programa'''
+    while seguir.lower() != "si" and seguir.lower() != "no":
+        seguir = input('Error. La respuesta no es ni "Si" ni "No", Intente de nuevo: ')
+    if seguir.lower() == "no":
+        seguir="No"
+        return seguir
+    else:
+        seguir="Si"
+        return seguir
+
 def imprimirmatriz(matriz):
     '''Muestra en pantalla la matriz de asientos con formato de columnas'''
     filas = len(matriz)
@@ -91,20 +91,7 @@ def imprimirmatriz(matriz):
         for c in range(columnas):
             print("%6d" %matriz[f][c], end="")
         print()
-        
-def VerEspectaculos(espectaculos,fechaespectaculos):
-    '''Imprime la lista de espectaculos registrados con sus fechas'''
-    print()
-    print("============ ESPECTACULOS =============")
-    for i in range(len(espectaculos)):
-        numero = str(i + 1)
-        print("   ", numero + "- [ " + espectaculos[i] + " - " + fechaespectaculos[i] + " ]")
-    if len(espectaculos) == 0:
-        print()
-        print("                  No se ingresaron espectaculos")
-        print()
-    print("=======================================")
-    print()
+
 def VerClientes(listaclientes):
     '''Imprime en pantalla la lista de clientes registrados'''
     print()
@@ -116,36 +103,39 @@ def VerClientes(listaclientes):
         print(" -No se encontraron clientes")
     print("=============================")
     print()
-#Otras funciones
-def ContinuarPrograma(seguir):
-    while (seguir != "No" and seguir != "no" and seguir != "NO" and
-           seguir != "Si" and seguir != "si" and seguir != "SI"):
-        seguir = input('Error. La respuesta no es ni "Si" ni "No", Intente de nuevo: ')
-    if seguir == "No" or seguir == "no" or seguir == "NO":
-        print("Terminando programa...")
-        return "No"
-    else:
-        print("Continuamos")
-        return "Si"
-#Funciones de archivo
+
+def VerificarValorMatriz(valor):
+    '''Valida que el valor ingresado para fila o columna este entre 1 y 10'''
+    while valor > 10 or valor < 1:
+        valor=PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
+    return valor
+
+#Listas 
+Clientes = []
+ListaEspectaculosEspectaculos = [] 
+FechasEspectaculos = []
+ListaDeAsientos=[]
+ListaDeCampo=[]
+
+#Variables Globales
+seguir = "Si"
+
 #MAIN
 while seguir != "No":
-    Menu() 
+    Menu()
     opcion = PedirEntero("Ingresar una opcion: ")
     print("-----------------------------------------------------------------------")
     while opcion > 6 or opcion < 1:
         Menu()
         opcion=PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
-        
     if opcion == 1: 
-        VerEspectaculos(Lista_EspectaculosEspectaculos,Fechas_Espectaculos)
-        
+        VerEspectaculos(ListaEspectaculosEspectaculos,FechasEspectaculos)
     if opcion == 2:
         espectaculo = input("Ingresar un espectaculo:")
         while espectaculo.strip() == "": 
             espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
         espectaculo=espectaculo.upper()
-        Lista_EspectaculosEspectaculos.append(espectaculo)
+        ListaEspectaculosEspectaculos.append(espectaculo)
         nuevamatriz = [[0 for c in range(10)] for f in range(10)]
         ListaDeAsientos.append(nuevamatriz)
         ListaDeCampo.append(0)
@@ -154,18 +144,17 @@ while seguir != "No":
         mes = PedirEntero("Ingrese mes del 1 al 12: ")
         año = PedirEntero("Ingrese año del 2026 en adelante: ")
         dia, mes, año = VerificarFormatoFecha(dia,mes,año)
-        GuardarFechaEspectaculo(dia,mes,año,Fechas_Espectaculos)
-        
+        GuardarFechaEspectaculo(dia,mes,año,FechasEspectaculos)
     if opcion == 3:
-        if len(Lista_EspectaculosEspectaculos) == 0:
+        if len(ListaEspectaculosEspectaculos) == 0:
             print("  -No se ingresaron espectaculos")
             print("=====================================")
         else:
             print("Espectaculos disponibles:")
-            for i in range(len(Lista_EspectaculosEspectaculos)):
-                print(i + 1, "-", Lista_EspectaculosEspectaculos[i])
+            for i in range(len(ListaEspectaculosEspectaculos)):
+                print(i + 1, "-", ListaEspectaculosEspectaculos[i])
             num_esp = PedirEntero("Seleccione el numero de espectaculo que desea ver: ")
-            while num_esp < 1 or num_esp > len(Lista_EspectaculosEspectaculos):
+            while num_esp < 1 or num_esp > len(ListaEspectaculosEspectaculos):
                 num_esp = PedirEntero("Error. Seleccione un numero valido de la lista: ")
             indiceespectaculo = num_esp - 1
             asientos = ListaDeAsientos[indiceespectaculo]
@@ -202,13 +191,10 @@ while seguir != "No":
                     if deseacomprar == "Si":
                         asientos[filacomprar - 1][columnacomprar - 1] = 1
                         print("Asiento reservado con exito")
-                        
             elif tipozona == 2:
                 vendidosactuales = ListaDeCampo[indiceespectaculo]
-                
                 if vendidosactuales >= 50:
                     print("Lo sentimos, el Campo para este espectaculo esta agotado (50/50).")
-                    
                 else:
                     preciocampo = 75000
                     print("Entradas de campo disponibles: " + str(50 - vendidosactuales) + "/50")
@@ -218,18 +204,18 @@ while seguir != "No":
                     if deseacomprar == "Si":
                         ListaDeCampo[indiceespectaculo] += 1
                         print("Entrada de campo reservada con exito")
-                        
     if opcion == 4:
         cliente = input("Ingrese su nombre y apellido:")
         while cliente.strip() == "": 
             cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
         cliente=cliente.title()
         Clientes.append(cliente)
-        
     if opcion == 5:
         VerClientes(Clientes)
-        
     if opcion == 6:
         seguir="No"
         print("Terminando programa...")
         print("=======================================")
+    if opcion != 6:
+        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
+        seguir = ContinuarPrograma(seguir)

@@ -13,7 +13,13 @@ def Menu ():
     print("  6 - Salir")
     print("========================================")
 
-def VerEspectaculos(espectaculos,fechaespectaculos):
+def IngresarEspectaculos():
+    ListaEspectaculos = []
+    EspectaculoIngresado = input("Ingrese el Espectaculo:")
+    ListaEspectaculos.append(EspectaculoIngresado)
+    return ListaEspectaculos
+
+def VerEspectaculos():
     '''Imprime la lista de espectaculos registrados con sus fechas'''
     print()
     print("============ ESPECTACULOS =============")
@@ -110,14 +116,10 @@ def VerificarValorMatriz(valor):
         valor = PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
     return valor
 
-def Programa():
-    Clientes = []
-    ListaEspectaculosEspectaculos = []
-    FechasEspectaculos = []
-    ListaDeAsientos = []
-    ListaDeCampo = []
-    seguir = "Si"
+#FUNCIONMAIN/PROGRAMAPRINCIPAL
 
+def Programa():
+    seguir = "Si"
     while seguir != "No":
         Menu()
         opcion = PedirEntero("Ingresar una opcion: ")
@@ -126,22 +128,9 @@ def Programa():
             Menu()
             opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
         if opcion == 1:
-            VerEspectaculos(ListaEspectaculosEspectaculos, FechasEspectaculos)
+            VerEspectaculos()
         if opcion == 2:
-            espectaculo = input("Ingresar un espectaculo:")
-            while espectaculo.strip() == "":
-                espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
-            espectaculo = espectaculo.upper()
-            ListaEspectaculosEspectaculos.append(espectaculo)
-            nuevamatriz = [[0 for c in range(10)] for f in range(10)]
-            ListaDeAsientos.append(nuevamatriz)
-            ListaDeCampo.append(0)
-            print("A continuacion ingresar en formato D/M/A la fecha")
-            dia = PedirEntero("Ingrese dia de 1 a 31: ")
-            mes = PedirEntero("Ingrese mes del 1 al 12: ")
-            año = PedirEntero("Ingrese año del 2026 en adelante: ")
-            dia, mes, año = VerificarFormatoFecha(dia, mes, año)
-            GuardarFechaEspectaculo(dia, mes, año, FechasEspectaculos)
+            IngresarEspectaculos()
         if opcion == 3:
             if len(ListaEspectaculosEspectaculos) == 0:
                 print("  -No se ingresaron espectaculos")

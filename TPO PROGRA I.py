@@ -1,5 +1,6 @@
 #Sistema de Venta de entradas para Espectaculos
-#Modulosw
+#Modulos
+#RAMAGABRIEL 
 import random
 #Listas 
 Clientes = []

@@ -7,8 +7,8 @@ def Menu ():
     print("================= MENU =================")
     print("  1 - Ver espectaculos")
     print("  2 - Ingresar Espectaculo")
-    print("  3 - Comprar tickets de entrada")
-    print("  4 - Ingresar Cliente")
+    print("  3 - Eliminar Espectaculo")
+    print("  4 - Modificar Espectaculo")
     print("  5 - Ver Clientes")
     print("  6 - Salir")
     print("========================================")
@@ -77,10 +77,10 @@ def ContinuarPrograma(seguir):
     while seguir.lower() != "si" and seguir.lower() != "no":
         seguir = input('Error. La respuesta no es ni "Si" ni "No", Intente de nuevo: ')
     if seguir.lower() == "no":
-        seguir="No"
+        seguir = "No"
         return seguir
     else:
-        seguir="Si"
+        seguir = "Si"
         return seguir
 
 def imprimirmatriz(matriz):
@@ -107,115 +107,107 @@ def VerClientes(listaclientes):
 def VerificarValorMatriz(valor):
     '''Valida que el valor ingresado para fila o columna este entre 1 y 10'''
     while valor > 10 or valor < 1:
-        valor=PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
+        valor = PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
     return valor
 
-#Listas 
-Clientes = []
-ListaEspectaculosEspectaculos = [] 
-FechasEspectaculos = []
-ListaDeAsientos=[]
-ListaDeCampo=[]
+def Programa():
+    Clientes = []
+    ListaEspectaculosEspectaculos = []
+    FechasEspectaculos = []
+    ListaDeAsientos = []
+    ListaDeCampo = []
+    seguir = "Si"
 
-#Variables Globales
-seguir = "Si"
-
-#MAIN
-while seguir != "No":
-    Menu()
-    opcion = PedirEntero("Ingresar una opcion: ")
-    print("-----------------------------------------------------------------------")
-    while opcion > 6 or opcion < 1:
+    while seguir != "No":
         Menu()
-        opcion=PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
-    if opcion == 1: 
-        VerEspectaculos(ListaEspectaculosEspectaculos,FechasEspectaculos)
-    if opcion == 2:
-        espectaculo = input("Ingresar un espectaculo:")
-        while espectaculo.strip() == "": 
-            espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
-        espectaculo=espectaculo.upper()
-        ListaEspectaculosEspectaculos.append(espectaculo)
-        nuevamatriz = [[0 for c in range(10)] for f in range(10)]
-        ListaDeAsientos.append(nuevamatriz)
-        ListaDeCampo.append(0)
-        print("A continuacion ingresar en formato D/M/A la fecha")
-        dia = PedirEntero("Ingrese dia de 1 a 31: ")
-        mes = PedirEntero("Ingrese mes del 1 al 12: ")
-        año = PedirEntero("Ingrese año del 2026 en adelante: ")
-        dia, mes, año = VerificarFormatoFecha(dia,mes,año)
-        GuardarFechaEspectaculo(dia,mes,año,FechasEspectaculos)
-    if opcion == 3:
-        if len(ListaEspectaculosEspectaculos) == 0:
-            print("  -No se ingresaron espectaculos")
-            print("=====================================")
-        else:
-            print("Espectaculos disponibles:")
-            for i in range(len(ListaEspectaculosEspectaculos)):
-                print(i + 1, "-", ListaEspectaculosEspectaculos[i])
-            num_esp = PedirEntero("Seleccione el numero de espectaculo que desea ver: ")
-            while num_esp < 1 or num_esp > len(ListaEspectaculosEspectaculos):
-                num_esp = PedirEntero("Error. Seleccione un numero valido de la lista: ")
-            indiceespectaculo = num_esp - 1
-            asientos = ListaDeAsientos[indiceespectaculo]
-            print("¿Qué zona desea comprar?")
-            print("1 - Platea / Asientos")
-            print("2 - Campo (Pie)")
-            tipozona = PedirEntero("Seleccione una opción (1 o 2): ")
-            while tipozona not in [1, 2]:
-                tipozona = PedirEntero("Opción inválida. Ingrese 1 para Asientos o 2 para Campo: ")
-            if tipozona == 1:
-                print("A continuacion se mostrara los asientos disponibles:")
-                print("--------------------------------------------------------------")
-                imprimirmatriz(asientos)
-                print("--------------------------------------------------------------")
-                deseacomprar = input("Desea comprar? (Responda Si o No): ")
-                deseacomprar = ContinuarPrograma(deseacomprar)
-                if deseacomprar == "Si":
-                    filacomprar = PedirEntero("¿En que fila desea comprar su asiento?: ")
-                    filacomprar = VerificarValorMatriz(filacomprar)
-                    columnacomprar = PedirEntero("¿En que columna desea comprar su asiento?: ")
-                    columnacomprar = VerificarValorMatriz(columnacomprar)
-                    print("--------------------------------------------------------------------")
-                    while asientos[filacomprar - 1][columnacomprar - 1] == 1:
-                        print("Error. La entrada ya ha sido vendida, Pruebe con otra.")
-                        filacomprar = PedirEntero("¿En que fila desea comprar su asiento?: ")
-                        filacomprar = VerificarValorMatriz(filacomprar)
-                        columnacomprar = PedirEntero("¿En que columna desea comprar su asiento?: ")
-                        columnacomprar = VerificarValorMatriz(columnacomprar)
-                        print("--------------------------------------------------------------------")  
-                    precioentrada = 110000 - (filacomprar * 5000)
-                    print(f"El precio de la entrada es de {precioentrada} pesos argentinos")
-                    deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
-                    deseacomprar = ContinuarPrograma(deseacomprar)
+        opcion = PedirEntero("Ingresar una opcion: ")
+        print("-----------------------------------------------------------------------")
+        while opcion > 6 or opcion < 1:
+            Menu()
+            opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
+        if opcion == 1:
+            VerEspectaculos(ListaEspectaculosEspectaculos, FechasEspectaculos)
+        if opcion == 2:
+            espectaculo = input("Ingresar un espectaculo:")
+            while espectaculo.strip() == "":
+                espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
+            espectaculo = espectaculo.upper()
+            ListaEspectaculosEspectaculos.append(espectaculo)
+            nuevamatriz = [[0 for c in range(10)] for f in range(10)]
+            ListaDeAsientos.append(nuevamatriz)
+            ListaDeCampo.append(0)
+            print("A continuacion ingresar en formato D/M/A la fecha")
+            dia = PedirEntero("Ingrese dia de 1 a 31: ")
+            mes = PedirEntero("Ingrese mes del 1 al 12: ")
+            año = PedirEntero("Ingrese año del 2026 en adelante: ")
+            dia, mes, año = VerificarFormatoFecha(dia, mes, año)
+            GuardarFechaEspectaculo(dia, mes, año, FechasEspectaculos)
+        if opcion == 3:
+            if len(ListaEspectaculosEspectaculos) == 0:
+                print("  -No se ingresaron espectaculos")
+                print("=====================================")
+            else:
+                print("Espectaculos disponibles:")
+                for i in range(len(ListaEspectaculosEspectaculos)):
+                    print(i + 1, "-", ListaEspectaculosEspectaculos[i])
+                num_esp = PedirEntero("Seleccione el numero de espectaculo que desea ver: ")
+                while num_esp < 1 or num_esp > len(ListaEspectaculosEspectaculos):
+                    num_esp = PedirEntero("Error. Seleccione un numero valido de la lista: ")
+                indiceespectaculo = num_esp - 1
+                asientos = ListaDeAsientos[indiceespectaculo]
+                print("¿Qué zona desea comprar?")
+                print("1 - Platea / Asientos")
+                print("2 - Campo (Pie)")
+                tipozona = PedirEntero("Seleccione una opción (1 o 2): ")
+                while tipozona not in [1, 2]:
+                    tipozona = PedirEntero("Opción inválida. Ingrese 1 para Asientos o 2 para Campo: ")
+                if tipozona == 1:
+                    print("A continuacion se mostrara los asientos disponibles:")
+                    print("--------------------------------------------------------------")
+                    imprimirmatriz(asientos)
+                    print("--------------------------------------------------------------")
+                    deseacomprar = ContinuarPrograma(input("Desea comprar? (Responda Si o No): "))
                     if deseacomprar == "Si":
-                        asientos[filacomprar - 1][columnacomprar - 1] = 1
-                        print("Asiento reservado con exito")
-            elif tipozona == 2:
-                vendidosactuales = ListaDeCampo[indiceespectaculo]
-                if vendidosactuales >= 50:
-                    print("Lo sentimos, el Campo para este espectaculo esta agotado (50/50).")
-                else:
-                    preciocampo = 75000
-                    print("Entradas de campo disponibles: " + str(50 - vendidosactuales) + "/50")
-                    print(f"El precio de la entrada de campo es de {preciocampo} pesos argentinos.")
-                    deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
-                    deseacomprar = ContinuarPrograma(deseacomprar)
-                    if deseacomprar == "Si":
-                        ListaDeCampo[indiceespectaculo] += 1
-                        print("Entrada de campo reservada con exito")
-    if opcion == 4:
-        cliente = input("Ingrese su nombre y apellido:")
-        while cliente.strip() == "": 
-            cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
-        cliente=cliente.title()
-        Clientes.append(cliente)
-    if opcion == 5:
-        VerClientes(Clientes)
-    if opcion == 6:
-        seguir="No"
-        print("Terminando programa...")
-        print("=======================================")
-    if opcion != 6:
-        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
-        seguir = ContinuarPrograma(seguir)
+                        filacomprar = VerificarValorMatriz(PedirEntero("¿En que fila desea comprar su asiento?: "))
+                        columnacomprar = VerificarValorMatriz(PedirEntero("¿En que columna desea comprar su asiento?: "))
+                        print("--------------------------------------------------------------------")
+                        while asientos[filacomprar - 1][columnacomprar - 1] == 1:
+                            print("Error. La entrada ya ha sido vendida, Pruebe con otra.")
+                            filacomprar = VerificarValorMatriz(PedirEntero("¿En que fila desea comprar su asiento?: "))
+                            columnacomprar = VerificarValorMatriz(PedirEntero("¿En que columna desea comprar su asiento?: "))
+                            print("--------------------------------------------------------------------")
+                        precioentrada = 110000 - (filacomprar * 5000)
+                        print(f"El precio de la entrada es de {precioentrada} pesos argentinos")
+                        deseacomprar = ContinuarPrograma(input("Quiere realizar la compra? (Si para continuar, No para cancelar): "))
+                        if deseacomprar == "Si":
+                            asientos[filacomprar - 1][columnacomprar - 1] = 1
+                            print("Asiento reservado con exito")
+                elif tipozona == 2:
+                    vendidosactuales = ListaDeCampo[indiceespectaculo]
+                    if vendidosactuales >= 50:
+                        print("Lo sentimos, el Campo para este espectaculo esta agotado (50/50).")
+                    else:
+                        preciocampo = 75000
+                        print("Entradas de campo disponibles: " + str(50 - vendidosactuales) + "/50")
+                        print(f"El precio de la entrada de campo es de {preciocampo} pesos argentinos.")
+                        deseacomprar = ContinuarPrograma(input("Quiere realizar la compra? (Si para continuar, No para cancelar): "))
+                        if deseacomprar == "Si":
+                            ListaDeCampo[indiceespectaculo] += 1
+                            print("Entrada de campo reservada con exito")
+        if opcion == 4:
+            cliente = input("Ingrese su nombre y apellido:")
+            while cliente.strip() == "":
+                cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
+            cliente = cliente.title()
+            Clientes.append(cliente)
+        if opcion == 5:
+            VerClientes(Clientes)
+        if opcion == 6:
+            seguir = "No"
+            print("Terminando programa...")
+            print("=======================================")
+        if opcion != 6:
+            seguir = ContinuarPrograma(input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): "))
+
+
+Programa()

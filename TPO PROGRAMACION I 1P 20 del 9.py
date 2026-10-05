@@ -12,16 +12,25 @@ def Menu ():
     print("  5 - Ver Clientes")
     print("  6 - Salir")
     print("========================================")
-
-def IngresarEspectaculos(lista):
+def MenuModificaciones():
+    print("1-Fecha")
+    print("- - - - ")
+    print("2-Nombre")
+    print("- - - - ")
+    print("3-PrecioEntrada")
+    print("- - - - - - - - -")
+    print("4-Stock")
+def IngresarEspectaculos(listae,listaf):
     espectaculo = input("Ingrese el Espectaculo: ").strip().lower()
-    lista.append(espectaculo)
+    listae.append(espectaculo)
     D = int(input("Ingrese el dia del mes:"))
     M = int(input("Ingrese el mes:"))
     A = int(input("Ingrese el año:"))
     VerificarFormatoFecha(D,M,A)
     Armar_Fecha_Completa(D,M,A)
-    return lista
+    GuardarFechaEspectaculo(D,M,A,listaf)
+
+    return listae
 
 def EliminarEspectaculos(lista):
     espectaculo = input("Ingrese el espectaculo que desea eliminar: ").strip().lower()
@@ -30,6 +39,13 @@ def EliminarEspectaculos(lista):
         print("Espectaculo eliminado")
     else:
         print("No se ha encontrado el espectaculo")
+def ModificarEspectaculo(lfecha,lprecios):
+    EspectaculoM = input("¿Que espectaculo desea modificar?:").lower() 
+    MenuModificaciones()
+    Opcion = input("Ingrese una opcion:")
+    if Opcion == 1: 
+
+
 """
 def VerEspectaculos(LISTAESPECTACULOS):
     '''Imprime la lista de espectaculos registrados con sus fechas'''
@@ -85,10 +101,10 @@ def Armar_Fecha_Completa(d, m, a):
     '''Convierte dia mes y año en un texto en formato dia mes año con separadores'''
     return "/".join(map(str, (d, m, a)))
 
-def GuardarFechaEspectaculo (diad,mesm,añoa,espectaculos):
+def GuardarFechaEspectaculo (diad,mesm,añoa,fespectaculos):
     '''Genera la fecha formateada y la guarda en la lista de fechas'''
     fecha = Armar_Fecha_Completa(diad, mesm, añoa)
-    espectaculos.append(fecha)
+    fespectaculos.append(fecha)
 
 def ContinuarPrograma(seguir):
     '''Valida y normaliza la respuesta del usuario para continuar o no el programa'''
@@ -134,6 +150,8 @@ def Programa():
     seguir = "Si"
     #VAR
     ListaEspec = []
+    FechaEspec = []
+    PrecioEntrada = []
     while seguir != "No":
         Menu()
         opcion = PedirEntero("Ingresar una opcion: ")
@@ -144,15 +162,11 @@ def Programa():
         """ if opcion == 1:
             VerEspectaculos(ListaEspec)"""
         if opcion == 2:
-            IngresarEspectaculos(ListaEspec)
+            IngresarEspectaculos(ListaEspec,FechaEspec)
         if opcion == 3:
             EliminarEspectaculos(ListaEspec)
-        """if opcion == 4:
-            cliente = input("Ingrese su nombre y apellido:")
-            while cliente.strip() == "":
-                cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
-            cliente = cliente.title()
-            Clientes.append(cliente)
+        if opcion == 4:
+            ModificarEspectaculo(FechaEspec,PrecioEntrada)
         if opcion == 5:
             VerClientes(Clientes)
         if opcion == 6:

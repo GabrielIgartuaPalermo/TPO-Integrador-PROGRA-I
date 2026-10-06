@@ -12,15 +12,17 @@ def Menu ():
     print("  5 - Ver Clientes")
     print("  6 - Salir")
     print("========================================")
+
 def MenuModificaciones():
-    print("1-Fecha")
+    print("1-Nombre")
     print("- - - - ")
-    print("2-Nombre")
+    print("2-Fecha")
     print("- - - - ")
     print("3-PrecioEntrada")
     print("- - - - - - - - -")
     print("4-Stock")
-def IngresarEspectaculos(listae,listaf):
+
+def IngresarEspectaculos(listae,listaf,listap):
     espectaculo = input("Ingrese el Espectaculo: ").strip().lower()
     listae.append(espectaculo)
     D = int(input("Ingrese el dia del mes:"))
@@ -29,6 +31,8 @@ def IngresarEspectaculos(listae,listaf):
     VerificarFormatoFecha(D,M,A)
     Armar_Fecha_Completa(D,M,A)
     GuardarFechaEspectaculo(D,M,A,listaf)
+    precioentrada = float(input("Ingrese el precio de la entrada para el espectaculo:"))
+    listap.append(precioentrada)
 
     return listae
 
@@ -39,11 +43,32 @@ def EliminarEspectaculos(lista):
         print("Espectaculo eliminado")
     else:
         print("No se ha encontrado el espectaculo")
-def ModificarEspectaculo(lfecha,lprecios):
+
+def ModificarEspectaculo(listaEspec,lfecha,lprecios):
     EspectaculoM = input("¿Que espectaculo desea modificar?:").lower() 
     MenuModificaciones()
     Opcion = input("Ingrese una opcion:")
     if Opcion == 1: 
+        nombre = input("Ingrese el nombre nuevo del espectaculo:").lower()
+        for indice, espec in enumerate(listaEspec):
+            if listaEspec[espec] == EspectaculoM:
+                listaEspec[espec].append(nombre)
+                indiceE = indice
+    if Opcion == 2: 
+        nombren = input("Ingrese el nombre del espectaculo que deseas modificar:").lower()
+        for indice, espec in enumerate(listaEspec):
+            if listaEspec[espec] == nombren:
+                print("A continuacion ingrese nuevamente la fecha:")
+                D = int(input("Ingrese el dia del mes:"))
+                M = int(input("Ingrese el mes:"))
+                A = int(input("Ingrese el año:"))
+                VerificarFormatoFecha(D,M,A)
+                Armar_Fecha_Completa(D,M,A)
+                fechan = Armar_Fecha_Completa(D,M,A)
+                lfecha[indice].append(fechan)
+    if Opcion == 3:
+
+
 
 
 """
@@ -162,11 +187,11 @@ def Programa():
         """ if opcion == 1:
             VerEspectaculos(ListaEspec)"""
         if opcion == 2:
-            IngresarEspectaculos(ListaEspec,FechaEspec)
+            IngresarEspectaculos(ListaEspec,FechaEspec,PrecioEntrada)
         if opcion == 3:
             EliminarEspectaculos(ListaEspec)
         if opcion == 4:
-            ModificarEspectaculo(FechaEspec,PrecioEntrada)
+            ModificarEspectaculo(ListaEspec.FechaEspec,PrecioEntrada)
         if opcion == 5:
             VerClientes(Clientes)
         if opcion == 6:

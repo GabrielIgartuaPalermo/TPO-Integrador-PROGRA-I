@@ -8,14 +8,64 @@ def Menu():
     print("  3 - Modificar Espectaculo")
     print("  4 - Salir")
     print("========================================")
-
-
 def MenuModificaciones():
-    print("1 - Nombre")
-    print("2 - Fecha")
-    print("3 - Precio de entrada")
-    print("4 - Stock")
+    print("1-Fecha")
+    print("- - - - ")
+    print("2-Nombre")
+    print("- - - - ")
+    print("3-PrecioEntrada")
+    print("- - - - - - - - -")
+    print("4-Stock")
+def IngresarEspectaculos(listae,listaf):
+    espectaculo = input("Ingrese el Espectaculo: ").strip().lower()
+    listae.append(espectaculo)
+    D = int(input("Ingrese el dia del mes:"))
+    M = int(input("Ingrese el mes:"))
+    A = int(input("Ingrese el año:"))
+    VerificarFormatoFecha(D,M,A)
+    Armar_Fecha_Completa(D,M,A)
+    GuardarFechaEspectaculo(D,M,A,listaf)
 
+    return listae
+
+def EliminarEspectaculos(lista):
+    espectaculo = input("Ingrese el espectaculo que desea eliminar: ").strip().lower()
+    if espectaculo in lista:
+        lista.remove(espectaculo)
+        print("Espectaculo eliminado")
+    else:
+        print("No se ha encontrado el espectaculo")
+def ModificarEspectaculo(lfecha,lprecios):
+    EspectaculoM = input("¿Que espectaculo desea modificar?:").lower() 
+    MenuModificaciones()
+    Opcion = input("Ingrese una opcion:")
+    if Opcion == 1: 
+
+
+"""
+def VerEspectaculos(LISTAESPECTACULOS):
+    '''Imprime la lista de espectaculos registrados con sus fechas'''
+    print()
+    print("============ ESPECTACULOS =============")
+    for i in range(len(LISTAESPECTACULOS)):
+        numero = str(i + 1)
+        print("   ", numero + "- [ " + LISTAESPECTACULOS[i] + " - " + LISTAESPECTACULOS[i] + " ]")
+    if len(LISTAESPECTACULOS) == 0:
+        print()
+        print("No se ingresaron espectaculos")
+        print()
+    print("=======================================")
+    print()
+"""
+def validar_formato(formato):
+    '''Verifica que un texto ingrese unicamente caracteres numericos y no este vacio'''
+    if len(formato) == 0:
+        return False
+    digitos = "0123456789"
+    for caracter in formato:
+        if caracter not in digitos:
+            return False
+    return True
 
 def PedirEntero(mensaje):
     while True:
@@ -214,18 +264,23 @@ def Programa():
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     while not terminar:
         Menu()
-        opcion = PedirEntero("Ingresar alguna de las opciones disponibles: ")
-        while opcion < 1 or opcion > 4:
-            print("Opcion inexistente.")
-            opcion = PedirEntero("Ingresar alguna de las opciones disponibles: ")
-
-        if opcion == 1:
-            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        elif opcion == 2:
-            EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        elif opcion == 3:
-            ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        else:
+        opcion = PedirEntero("Ingresar una opcion: ")
+        print("-----------------------------------------------------------------------")
+        while opcion > 6 or opcion < 1:
+            Menu()
+            opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
+        """ if opcion == 1:
+            VerEspectaculos(ListaEspec)"""
+        if opcion == 2:
+            IngresarEspectaculos(ListaEspec,FechaEspec)
+        if opcion == 3:
+            EliminarEspectaculos(ListaEspec)
+        if opcion == 4:
+            ModificarEspectaculo(FechaEspec,PrecioEntrada)
+        if opcion == 5:
+            VerClientes(Clientes)
+        if opcion == 6:
+            seguir = "No"
             print("Terminando programa...")
             terminar = True
         GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)

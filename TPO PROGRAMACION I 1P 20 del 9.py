@@ -11,8 +11,6 @@ def Menu():
     print("  6 - Ver Clientes")
     print("  7 - Salir")
     print("========================================")
-
-
 def MenuModificaciones():
     print("1-Nombre")
     print("- - - - ")
@@ -21,8 +19,6 @@ def MenuModificaciones():
     print("3-PrecioEntrada")
     print("- - - - - - - - -")
     print("4-Stock")
-
-
 def validar_formato(formato):
     '''Verifica que un texto ingrese unicamente caracteres numericos y no este vacio'''
     if len(formato) == 0:
@@ -32,8 +28,6 @@ def validar_formato(formato):
         if caracter not in digitos:
             return False
     return True
-
-
 def PedirEntero(mensaje):
     texto = input(mensaje).strip()
     if validar_formato(texto):
@@ -41,8 +35,6 @@ def PedirEntero(mensaje):
     else:
         print("Ingrese un numero entero.")
         return PedirEntero(mensaje)
-
-
 def PedirNombre(mensaje):
     nombre = input(mensaje).strip().lower()
     if nombre != "":
@@ -50,12 +42,20 @@ def PedirNombre(mensaje):
     else:
         print("El nombre no puede estar vacio.")
         return PedirNombre(mensaje)
-
-
+def PedirPrecio(mensaje):
+    try:
+        precio = float(input(mensaje))
+    except ValueError:
+        print("Ingrese un precio numerico.")
+        return PedirPrecio(mensaje)
+    if precio > 0:
+        return precio
+    else:
+        print("El precio debe ser mayor que cero.")
+        return PedirPrecio(mensaje)
 def VerificarFormatoFecha(dia, mes, año):
     if año < 2026 or mes < 1 or mes > 12:
         return False
-
     if mes == 2:
         if (año % 4 == 0 and año % 100 != 0) or año % 400 == 0:
             max_dias = 29
@@ -65,16 +65,11 @@ def VerificarFormatoFecha(dia, mes, año):
         max_dias = 30
     else:
         max_dias = 31
-
     if dia < 1 or dia > max_dias:
         return False
     return True
-
-
 def Armar_Fecha_Completa(dia, mes, año):
     return str(dia) + "/" + str(mes) + "/" + str(año)
-
-
 def PedirFecha():
     dia = PedirEntero("Ingrese el dia del mes: ")
     mes = PedirEntero("Ingrese el mes: ")
@@ -84,243 +79,181 @@ def PedirFecha():
     else:
         print("La fecha ingresada no es valida.")
         return PedirFecha()
-
-
-def PedirPrecio(mensaje):
-    try:
-        precio = float(input(mensaje))
-    except ValueError:
-        print("Ingrese un precio numerico.")
-        return PedirPrecio(mensaje)
-
-    if precio > 0:
-        return precio
-    else:
-        print("El precio debe ser mayor que cero.")
-        return PedirPrecio(mensaje)
-
-
-def VerEspectaculos(listae, listaf, listap, listadestock):
+def VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     '''Imprime la lista de espectaculos registrados con sus fechas, precios y stock'''
     print()
     print("============ ESPECTACULOS =============")
     numero = 1
-    for espectaculo in listae:
-        print("   " + str(numero) + "- [ " + espectaculo + " - " + listaf[espectaculo] + " - $" + str(listap[espectaculo]) + " - Stock: " + str(listadestock[espectaculo]) + " ]")
+    for espectaculo in listaEspectaculos:
+        print("   " + str(numero) + "- [ " + espectaculo + " - " + listaFechas[espectaculo] + " - $" + str(listaPrecios[espectaculo]) + " - Stock: " + str(listaStock[espectaculo]) + " ]")
         numero = numero + 1
-    if len(listae) == 0:
+    if len(listaEspectaculos) == 0:
         print()
         print("No se ingresaron espectaculos")
         print()
     print("=======================================")
     print()
-
-
-def AgregarEspectaculo(listae, listaf, listap, listadestock, nombre, fecha, precio, stock=1):
-    listae[nombre] = nombre
-    listaf[nombre] = fecha
-    listap[nombre] = precio
-    listadestock[nombre] = stock
-
-
-def IngresarEspectaculos(listae, listaf, listap, listadestock):
+def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock=1):
+    listaEspectaculos[nombre] = nombre
+    listaFechas[nombre] = fecha
+    listaPrecios[nombre] = precio
+    listaStock[nombre] = stock
+def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     espectaculo = PedirNombre("Ingrese el Espectaculo: ")
-    if espectaculo in listae:
+    if espectaculo in listaEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
         return
-
     fecha = PedirFecha()
     precio = PedirPrecio("Ingrese el precio de la entrada para el espectaculo: ")
-    AgregarEspectaculo(listae, listaf, listap, listadestock, espectaculo, fecha, precio)
+    AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, espectaculo, fecha, precio)
     print("Espectaculo ingresado.")
-
-
-def EliminarEspectaculos(listae, listaf, listap, listadestock):
+def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     espectaculo = PedirNombre("Ingrese el espectaculo que desea eliminar: ")
-    if espectaculo not in listae:
+    if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
-
-    del listae[espectaculo]
-    del listaf[espectaculo]
-    del listap[espectaculo]
-    del listadestock[espectaculo]
+    del listaEspectaculos[espectaculo]
+    del listaFechas[espectaculo]
+    del listaPrecios[espectaculo]
+    del listaStock[espectaculo]
     print("Espectaculo eliminado.")
-
-
-def ActualizarNombreEnCompras(listacompras, viejo, nuevo, inicio=0):
+def ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio=0):
     '''Reemplaza el nombre viejo por el nuevo en las compras ya realizadas'''
-    if inicio < len(listacompras):
-        if listacompras[inicio] == viejo:
-            listacompras[inicio] = nuevo
-        ActualizarNombreEnCompras(listacompras, viejo, nuevo, inicio + 1)
-
-
-def ModificarNombre(listaEspec, lfecha, lprecios, listastock, listacompras, viejo):
+    if inicio < len(listaCompras):
+        if listaCompras[inicio] == viejo:
+            listaCompras[inicio] = nuevo
+        ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio + 1)
+def ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, viejo):
     nuevo = PedirNombre("Ingrese el nombre nuevo del espectaculo: ")
-    if nuevo != viejo and nuevo in listaEspec:
+    if nuevo != viejo and nuevo in listaEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
         return
-
     if nuevo != viejo:
-        listaEspec[nuevo] = nuevo
-        lfecha[nuevo] = lfecha[viejo]
-        lprecios[nuevo] = lprecios[viejo]
-        listastock[nuevo] = listastock[viejo]
-        del listaEspec[viejo]
-        del lfecha[viejo]
-        del lprecios[viejo]
-        del listastock[viejo]
+        listaEspectaculos[nuevo] = nuevo
+        listaFechas[nuevo] = listaFechas[viejo]
+        listaPrecios[nuevo] = listaPrecios[viejo]
+        listaStock[nuevo] = listaStock[viejo]
+        del listaEspectaculos[viejo]
+        del listaFechas[viejo]
+        del listaPrecios[viejo]
+        del listaStock[viejo]
         # Se actualiza el nombre en las compras ya realizadas
-        ActualizarNombreEnCompras(listacompras, viejo, nuevo)
+        ActualizarNombreEnCompras(listaCompras, viejo, nuevo)
     print("Nombre modificado.")
-
-
-def ModificarFecha(lfecha, espectaculo):
+def ModificarFecha(listaFechas, espectaculo):
     print("A continuacion ingrese nuevamente la fecha:")
-    lfecha[espectaculo] = PedirFecha()
-
-
-def ModificarPrecio(lprecios, espectaculo):
+    listaFechas[espectaculo] = PedirFecha()
+def ModificarPrecio(listaPrecios, espectaculo):
     print("Ingrese a continuacion el nuevo precio:")
-    lprecios[espectaculo] = PedirPrecio("Ingresar precio: ")
-
-
-def ModificarStock(listastock, espectaculo):
+    listaPrecios[espectaculo] = PedirPrecio("Ingresar precio: ")
+def ModificarStock(listaStock, espectaculo):
     subopcion = PedirEntero("Ingrese 1 para cambiar el stock o 2 para sumar stock: ")
     while subopcion != 1 and subopcion != 2:
         print("Opcion inexistente.")
         subopcion = PedirEntero("Ingrese 1 para cambiar el stock o 2 para sumar stock: ")
-
     cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
     while cantidad < 1:
         print("El stock debe ser como minimo 1.")
         cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
-
     if subopcion == 1:
-        listastock[espectaculo] = cantidad
+        listaStock[espectaculo] = cantidad
     else:
-        listastock[espectaculo] = listastock[espectaculo] + cantidad
-
-
-def ModificarEspectaculo(listaEspec, lfecha, lprecios, listastock, listacompras):
+        listaStock[espectaculo] = listaStock[espectaculo] + cantidad
+def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras):
     espectaculo = PedirNombre("¿Que espectaculo desea modificar?: ")
-    if espectaculo not in listaEspec:
+    if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
-
     MenuModificaciones()
     opcion = PedirEntero("Ingrese una opcion: ")
     while opcion < 1 or opcion > 4:
         print("Opcion inexistente.")
         opcion = PedirEntero("Ingrese una opcion: ")
-
     if opcion == 1:
-        ModificarNombre(listaEspec, lfecha, lprecios, listastock, listacompras, espectaculo)
+        ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, espectaculo)
     elif opcion == 2:
-        ModificarFecha(lfecha, espectaculo)
+        ModificarFecha(listaFechas, espectaculo)
     elif opcion == 3:
-        ModificarPrecio(lprecios, espectaculo)
+        ModificarPrecio(listaPrecios, espectaculo)
     else:
-        ModificarStock(listastock, espectaculo)
-
-
-def VenderEntradas(listae, listap, listadestock, listaclientes, listacompras, listacantidades):
+        ModificarStock(listaStock, espectaculo)
+def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades):
     '''Registra la venta de entradas a un cliente y descuenta el stock'''
     espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas: ")
-    if espectaculo not in listae:
+    if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
-
-    if listadestock[espectaculo] == 0:
+    if listaStock[espectaculo] == 0:
         print("No quedan entradas disponibles para este espectaculo.")
         return
-
     cliente = PedirNombre("Ingrese el nombre del cliente: ")
     cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
-    while cantidad < 1 or cantidad > listadestock[espectaculo]:
-        print("La cantidad debe ser de al menos 1 y no puede superar el stock (" + str(listadestock[espectaculo]) + ").")
+    while cantidad < 1 or cantidad > listaStock[espectaculo]:
+        print("La cantidad debe ser de al menos 1 y no puede superar el stock (" + str(listaStock[espectaculo]) + ").")
         cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
-
-    listadestock[espectaculo] = listadestock[espectaculo] - cantidad
-    listaclientes.append(cliente)
-    listacompras.append(espectaculo)
-    listacantidades.append(cantidad)
-    total = listap[espectaculo] * cantidad
+    listaStock[espectaculo] = listaStock[espectaculo] - cantidad
+    listaClientes.append(cliente)
+    listaCompras.append(espectaculo)
+    listaCantidades.append(cantidad)
+    total = listaPrecios[espectaculo] * cantidad
     print("Venta realizada. Total a pagar: $" + str(total))
-
-
-def ImprimirClientes(listaclientes, listacompras, listacantidades, inicio=0):
+def ImprimirClientes(listaClientes, listaCompras, listaCantidades, inicio=0):
     '''Imprime un cliente por linea, recorriendo la lista de forma recursiva'''
-    if inicio < len(listaclientes):
+    if inicio < len(listaClientes):
         numero = str(inicio + 1)
-        print("   " + numero + "- [ " + listaclientes[inicio] + " - " + listacompras[inicio] + " - Entradas: " + str(listacantidades[inicio]) + " ]")
-        ImprimirClientes(listaclientes, listacompras, listacantidades, inicio + 1)
-
-
-def VerClientes(listaclientes, listacompras, listacantidades):
+        print("   " + numero + "- [ " + listaClientes[inicio] + " - " + listaCompras[inicio] + " - Entradas: " + str(listaCantidades[inicio]) + " ]")
+        ImprimirClientes(listaClientes, listaCompras, listaCantidades, inicio + 1)
+def VerClientes(listaClientes, listaCompras, listaCantidades):
     '''Imprime la lista de clientes con el espectaculo y la cantidad de entradas compradas'''
     print()
     print("============== CLIENTES ===============")
-    ImprimirClientes(listaclientes, listacompras, listacantidades)
-    if len(listaclientes) == 0:
+    ImprimirClientes(listaClientes, listaCompras, listaCantidades)
+    if len(listaClientes) == 0:
         print()
         print("No se registraron clientes")
         print()
     print("=======================================")
     print()
-
-
-def GuardarEspectaculos(listae, listaf, listap, listadestock):
+def GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     with open("espectaculos.txt", "w", encoding="utf-8") as archivo:
-        for espectaculo in listae:
+        for espectaculo in listaEspectaculos:
             archivo.write(espectaculo + "\n")
-            archivo.write(listaf[espectaculo] + "\n")
-            archivo.write(str(listap[espectaculo]) + "\n")
-            archivo.write(str(listadestock[espectaculo]) + "\n")
-
-
-def CargarEspectaculos(listae, listaf, listap, listadestock):
+            archivo.write(listaFechas[espectaculo] + "\n")
+            archivo.write(str(listaPrecios[espectaculo]) + "\n")
+            archivo.write(str(listaStock[espectaculo]) + "\n")
+def CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     try:
         with open("espectaculos.txt", "r", encoding="utf-8") as archivo:
             while True:
                 nombre = archivo.readline().strip()
                 if nombre == "":
                     break
-
                 fecha = archivo.readline().strip()
                 precio = float(archivo.readline())
                 stock = int(archivo.readline())
-                AgregarEspectaculo(listae, listaf, listap, listadestock, nombre, fecha, precio, stock)
+                AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock)
     except FileNotFoundError:
         print("No existe el archivo, se inicia vacio.")
-
-
-def GuardarClientes(listaclientes, listacompras, listacantidades):
+def GuardarClientes(listaClientes, listaCompras, listaCantidades):
     with open("clientes.txt", "w", encoding="utf-8") as archivo:
-        for i in range(len(listaclientes)):
-            archivo.write(listaclientes[i] + "\n")
-            archivo.write(listacompras[i] + "\n")
-            archivo.write(str(listacantidades[i]) + "\n")
-
-
-def CargarClientes(listaclientes, listacompras, listacantidades):
+        for i in range(len(listaClientes)):
+            archivo.write(listaClientes[i] + "\n")
+            archivo.write(listaCompras[i] + "\n")
+            archivo.write(str(listaCantidades[i]) + "\n")
+def CargarClientes(listaClientes, listaCompras, listaCantidades):
     try:
         with open("clientes.txt", "r", encoding="utf-8") as archivo:
             while True:
                 cliente = archivo.readline().strip()
                 if cliente == "":
                     break
-
                 espectaculo = archivo.readline().strip()
                 cantidad = int(archivo.readline())
-                listaclientes.append(cliente)
-                listacompras.append(espectaculo)
-                listacantidades.append(cantidad)
+                listaClientes.append(cliente)
+                listaCompras.append(espectaculo)
+                listaCantidades.append(cantidad)
     except FileNotFoundError:
         print("No existe el archivo de clientes, se inicia vacio.")
-
-
 def Programa():
     listaEspectaculos = {}
     listaFechas = {}
@@ -330,7 +263,6 @@ def Programa():
     listaCompras = []
     listaCantidades = []
     terminar = False
-
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades)
     while not terminar:
@@ -342,23 +274,21 @@ def Programa():
             opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
         if opcion == 1:
             VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        if opcion == 2:
+        elif opcion == 2:
             IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        if opcion == 3:
+        elif opcion == 3:
             EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        if opcion == 4:
+        elif opcion == 4:
             ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras)
-        if opcion == 5:
+        elif opcion == 5:
             VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
-        if opcion == 6:
+        elif opcion == 6:
             VerClientes(listaClientes, listaCompras, listaCantidades)
-        if opcion == 7:
+        else:
             print("Terminando programa...")
             terminar = True
         GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         GuardarClientes(listaClientes, listaCompras, listaCantidades)
-
-
 try:
     Programa()
 except (EOFError, KeyboardInterrupt):

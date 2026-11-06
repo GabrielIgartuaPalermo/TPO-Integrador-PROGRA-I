@@ -309,6 +309,8 @@ def CargarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, l
         print("Sistema restaurado exitosamente")
     except FileNotFoundError:
         print("No se encontró ningún archivo de respaldo ('backup_sistema.json').")
+    except json.JSONDecodeError:
+        print("El Archivo se encuentra vacio o esta corrompido")
 
 def GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     with open("espectaculos.txt", "w", encoding="utf-8") as archivo:

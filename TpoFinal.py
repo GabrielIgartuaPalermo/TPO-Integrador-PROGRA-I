@@ -103,20 +103,24 @@ def VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     print("=======================================")
     print()
 
-def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock=1):
+def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock):
     listaEspectaculos[nombre] = nombre
     listaFechas[nombre] = fecha
     listaPrecios[nombre] = precio
     listaStock[nombre] = stock
 
-def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock, stock):
     espectaculo = PedirNombre("Ingrese el Espectaculo: ")
     if espectaculo in listaEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
         return
     fecha = PedirFecha()
     precio = PedirPrecio("Ingrese el precio de la entrada para el espectaculo: ")
-    AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, espectaculo, fecha, precio)
+    stock = PedirEntero("Ingrese la cantidad de entradas: ")
+    while stock < 1:
+        print("El stock debe ser como minimo 1.")
+        stock = PedirEntero("Ingrese la cantidad de entradas: ")
+    AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, espectaculo, fecha, precio, stock)
     print("Espectaculo ingresado.")
 
 def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
@@ -189,7 +193,12 @@ def ModificarStock(listaStock, espectaculo):
 
 def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras):
     VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-    espectaculo = PedirNombre("¿Que espectaculo desea modificar? (nombre): ")
+    print()
+    if len(listaEspectaculos) == 0:
+        print("No se ingresaron espectaculos")
+        return
+    espectaculo = PedirNombre("¿Que espectaculo desea modificar?: ")
+    # ... el resto queda igual
     if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
@@ -207,10 +216,9 @@ def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStoc
     else:
         ModificarStock(listaStock, espectaculo)
 
-def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaFechas):
+def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades):
     '''Registra la venta de entradas a un cliente y descuenta el stock'''
-    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-    espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas (nombre): ")
+    espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas: ")
     if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
@@ -300,6 +308,7 @@ def Programa():
     listaClientes = []
     listaCompras = []
     listaCantidades = []
+    stock= 0
     terminar = False
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades)
@@ -313,13 +322,13 @@ def Programa():
         if opcion == 1:
             VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 2:
-            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock, stock)
         elif opcion == 3:
             EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 4:
             ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras)
         elif opcion == 5:
-            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaFechas)
+            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
         elif opcion == 6:
             VerClientes(listaClientes, listaCompras, listaCantidades)
         else:

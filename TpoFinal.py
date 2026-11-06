@@ -364,6 +364,7 @@ def Programa():
     listaClientes = []
     listaCompras = []
     listaCantidades = []
+    stock = 0
     terminar = False
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades)

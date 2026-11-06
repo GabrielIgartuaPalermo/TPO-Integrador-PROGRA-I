@@ -53,7 +53,7 @@ def PedirNombre(mensaje):
     
 def PedirPrecio(mensaje):
     try:
-        precio = float(input(mensaje))
+        precio = int(input(mensaje))
     except ValueError:
         print("Ingrese un precio numerico.")
         return PedirPrecio(mensaje)

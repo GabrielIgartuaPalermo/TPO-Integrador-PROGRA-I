@@ -113,7 +113,7 @@ def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock,
     listaPrecios[nombre] = precio
     listaStock[nombre] = stock
 
-def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock, stock):
+def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     espectaculo = PedirNombre("Ingrese el Espectaculo: ")
     if espectaculo in listaEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
@@ -218,8 +218,9 @@ def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStoc
     else:
         ModificarStock(listaStock, espectaculo)
 
-def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades):
+def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaFechas):
     '''Registra la venta de entradas a un cliente y descuenta el stock'''
+    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas: ")
     if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
@@ -305,7 +306,7 @@ def CargarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, l
             for compra in datos["compras"]:
                 listaCompras.append(compra)
             for cantidad in datos["cantidades"]:
-                listaCantidades.append(cantidad)       
+                listaCantidades.append(cantidad)        
         print("Sistema restaurado exitosamente")
     except FileNotFoundError:
         print("No se encontró ningún archivo de respaldo ('backup_sistema.json').")
@@ -364,7 +365,6 @@ def Programa():
     listaClientes = []
     listaCompras = []
     listaCantidades = []
-    stock = 0
     terminar = False
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades)
@@ -378,13 +378,18 @@ def Programa():
         if opcion == 1:
             VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 2:
-            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock, stock)
+            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 3:
             EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 4:
             ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         elif opcion == 5:
-            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
+            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaFechas)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades)
         elif opcion == 6:
             VerClientes(listaClientes, listaCompras, listaCantidades)
         elif opcion == 7:
@@ -394,8 +399,6 @@ def Programa():
         else:
             print("Terminando programa...")
             terminar = True
-        GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-        GuardarClientes(listaClientes, listaCompras, listaCantidades)
 
 try:
     Programa()

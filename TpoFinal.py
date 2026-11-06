@@ -1,3 +1,5 @@
+import json
+
 # Sistema de Venta de entradas para Espectaculos
 
 def Menu():
@@ -9,7 +11,9 @@ def Menu():
     print("  4 - Modificar Espectaculo")
     print("  5 - Vender Entradas")
     print("  6 - Ver Clientes")
-    print("  7 - Salir")
+    print("  7 - Guardar Backup")
+    print("  8 - Restaurar desde Backup")
+    print("  9 - Salir")
     print("========================================")
 
 def MenuModificaciones():
@@ -129,11 +133,11 @@ def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStoc
     if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
-    confirmacionextra=input("Esta seguro? (Si o No): ")
-    confirmacionextra=confirmacionextra.lower()
+    confirmacionextra = input("Esta seguro? (Si o No): ")
+    confirmacionextra = confirmacionextra.lower()
     while confirmacionextra != "si" and confirmacionextra != "no":
-        confirmacionextra=input("Respuesta incorrecta (Responda 'Si' o 'No'): ")
-        confirmacionextra=confirmacionextra.lower()
+        confirmacionextra = input("Respuesta incorrecta (Responda 'Si' o 'No'): ")
+        confirmacionextra = confirmacionextra.lower()
     if confirmacionextra == "si":
         del listaEspectaculos[espectaculo]
         del listaFechas[espectaculo]
@@ -165,7 +169,6 @@ def ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, li
         del listaFechas[viejo]
         del listaPrecios[viejo]
         del listaStock[viejo]
-        # Se actualiza el nombre en las compras ya realizadas
         ActualizarNombreEnCompras(listaCompras, viejo, nuevo)
     print("Nombre modificado.")
 
@@ -198,7 +201,6 @@ def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStoc
         print("No se ingresaron espectaculos")
         return
     espectaculo = PedirNombre("¿Que espectaculo desea modificar?: ")
-    # ... el resto queda igual
     if espectaculo not in listaEspectaculos:
         print("No se encontro el espectaculo.")
         return
@@ -256,6 +258,58 @@ def VerClientes(listaClientes, listaCompras, listaCantidades):
     print("=======================================")
     print()
 
+def GuardarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades):
+    '''Guarda absolutamente todo el estado del sistema en un archivo JSON unificado'''
+    datos = {
+        "espectaculos": listaEspectaculos,
+        "fechas": listaFechas,
+        "precios": listaPrecios,
+        "stock": listaStock,
+        "clientes": listaClientes,
+        "compras": listaCompras,
+        "cantidades": listaCantidades
+    }
+    with open("backup_sistema.json", "w", encoding="utf-8") as archivo:
+        json.dump(datos, archivo, indent=4, ensure_ascii=False)
+    print("Backup guardado exitosamente en 'backup_sistema.json'")
+
+def CargarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades):
+    '''Restaura los datos del sistema desde el backup usando solo bucles y del/append'''
+    try:
+        with open("backup_sistema.json", "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+            for clave in list(listaEspectaculos.keys()):
+                del listaEspectaculos[clave]
+            for clave in list(listaFechas.keys()):
+                del listaFechas[clave]
+            for clave in list(listaPrecios.keys()):
+                del listaPrecios[clave]
+            for clave in list(listaStock.keys()):
+                del listaStock[clave]
+            for clave in datos["espectaculos"]:
+                listaEspectaculos[clave] = datos["espectaculos"][clave]
+            for clave in datos["fechas"]:
+                listaFechas[clave] = datos["fechas"][clave]
+            for clave in datos["precios"]:
+                listaPrecios[clave] = datos["precios"][clave]
+            for clave in datos["stock"]:
+                listaStock[clave] = datos["stock"][clave]
+            while len(listaClientes) > 0:
+                del listaClientes[0]
+            while len(listaCompras) > 0:
+                del listaCompras[0]
+            while len(listaCantidades) > 0:
+                del listaCantidades[0]
+            for cliente in datos["clientes"]:
+                listaClientes.append(cliente)
+            for compra in datos["compras"]:
+                listaCompras.append(compra)
+            for cantidad in datos["cantidades"]:
+                listaCantidades.append(cantidad)       
+        print("Sistema restaurado exitosamente")
+    except FileNotFoundError:
+        print("No se encontró ningún archivo de respaldo ('backup_sistema.json').")
+
 def GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     with open("espectaculos.txt", "w", encoding="utf-8") as archivo:
         for espectaculo in listaEspectaculos:
@@ -308,7 +362,7 @@ def Programa():
     listaClientes = []
     listaCompras = []
     listaCantidades = []
-    stock= 0
+    stock = 0
     terminar = False
     CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades)
@@ -316,7 +370,7 @@ def Programa():
         Menu()
         opcion = PedirEntero("Ingresar una opcion: ")
         print("-----------------------------------------------------------------------")
-        while opcion > 7 or opcion < 1:
+        while opcion > 9 or opcion < 1:
             Menu()
             opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
         if opcion == 1:
@@ -331,11 +385,16 @@ def Programa():
             VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
         elif opcion == 6:
             VerClientes(listaClientes, listaCompras, listaCantidades)
+        elif opcion == 7:
+            GuardarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
+        elif opcion == 8:
+            CargarBackupJSON(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades)
         else:
             print("Terminando programa...")
             terminar = True
         GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
         GuardarClientes(listaClientes, listaCompras, listaCantidades)
+
 try:
     Programa()
 except (EOFError, KeyboardInterrupt):

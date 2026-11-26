@@ -10,6 +10,7 @@ ZONAS = {
 
 
 def Menu():
+    '''Muestra el menu principal del sistema en consola'''
     print()
     print("================= MENU =================")
     print("  1 - Ver Espectaculos")
@@ -26,6 +27,7 @@ def Menu():
 
 
 def MenuModificaciones():
+    '''Muestra las opciones disponibles para modificar un espectaculo'''
     print("1-Nombre")
     print("- - - - ")
     print("2-Fecha")
@@ -36,6 +38,7 @@ def MenuModificaciones():
 
 
 def MenuZonas(precio_base, stock_esp):
+    '''Muestra las ubicaciones del estadio con su precio calculado y stock disponible'''
     print()
     print("---------- UBICACIONES DEL ESTADIO ----------")
     for codigo in ZONAS:
@@ -59,6 +62,7 @@ def validar_formato(formato):
 
 
 def PedirEntero(mensaje):
+    '''Solicita y valida de forma recursiva un numero entero por consola'''
     texto = input(mensaje).strip()
     if validar_formato(texto):
         return int(texto)
@@ -68,6 +72,7 @@ def PedirEntero(mensaje):
 
 
 def PedirNombre(mensaje):
+    '''Solicita y valida de forma recursiva un texto no vacio en minusculas'''
     nombre = input(mensaje).strip().lower()
     if nombre != "":
         return nombre
@@ -77,6 +82,7 @@ def PedirNombre(mensaje):
 
 
 def PedirPrecio(mensaje):
+    '''Solicita y valida de forma recursiva un precio numerico mayor a cero'''
     try:
         precio = float(input(mensaje).strip().replace(",", "."))
     except ValueError:
@@ -90,6 +96,7 @@ def PedirPrecio(mensaje):
 
 
 def VerificarFormatoFecha(dia, mes, año):
+    '''Verifica que el dia, mes y año correspondan a una fecha valida desde 2027'''
     if año < 2027 or mes < 1 or mes > 12:
         return False
     if mes == 2:
@@ -107,10 +114,12 @@ def VerificarFormatoFecha(dia, mes, año):
 
 
 def Armar_Fecha_Completa(dia, mes, año):
+    '''Construye una cadena de fecha con formato dia/mes/año'''
     return str(dia) + "/" + str(mes) + "/" + str(año)
 
 
 def PedirFecha():
+    '''Solicita y valida de forma recursiva una fecha completa'''
     dia = PedirEntero("Ingrese el dia del mes: ")
     mes = PedirEntero("Ingrese el mes: ")
     año = PedirEntero("Ingrese el año: ")
@@ -122,6 +131,7 @@ def PedirFecha():
 
 
 def PedirStockPorZonas(mensaje_intro):
+    '''Solicita y valida la cantidad de entradas iniciales para cada zona'''
     print(mensaje_intro)
     stock_zonas = {}
     for codigo in ZONAS:
@@ -135,6 +145,7 @@ def PedirStockPorZonas(mensaje_intro):
 
 
 def FormatearStock(stock_esp):
+    '''Devuelve una cadena con el stock disponible de cada sector'''
     return (
         "VIP: " + str(stock_esp.get("vip", 0))
         + " | Campo: " + str(stock_esp.get("campo", 0))
@@ -142,15 +153,15 @@ def FormatearStock(stock_esp):
     )
 
 
-def VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+def VerEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock):
     '''Imprime la lista de espectaculos registrados con sus fechas, precios base y stock por sector'''
     print()
     print("============ ESPECTACULOS =============")
     numero = 1
-    for espectaculo in listaEspectaculos:
-        print("   " + str(numero) + "- [ " + espectaculo + " - " + listaFechas[espectaculo] + " - Base: $" + str(listaPrecios[espectaculo]) + " - " + FormatearStock(listaStock[espectaculo]) + " ]")
+    for espectaculo in diccionarioEspectaculos:
+        print("   " + str(numero) + "- [ " + espectaculo + " - " + diccionarioFechas[espectaculo] + " - Base: $" + str(diccionarioPrecios[espectaculo]) + " - " + FormatearStock(diccionarioStock[espectaculo]) + " ]")
         numero = numero + 1
-    if len(listaEspectaculos) == 0:
+    if len(diccionarioEspectaculos) == 0:
         print()
         print("No se ingresaron espectaculos")
         print()
@@ -158,20 +169,22 @@ def VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
     print()
 
 
-def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock):
-    listaEspectaculos[nombre] = nombre
-    listaFechas[nombre] = fecha
-    listaPrecios[nombre] = float(precio)
-    listaStock[nombre] = {
+def AgregarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, nombre, fecha, precio, stock):
+    '''Registra un espectaculo y sus datos asociados en los diccionarios correspondientes'''
+    diccionarioEspectaculos[nombre] = nombre
+    diccionarioFechas[nombre] = fecha
+    diccionarioPrecios[nombre] = float(precio)
+    diccionarioStock[nombre] = {
         "vip": int(stock.get("vip", 0)),
         "campo": int(stock.get("campo", 0)),
         "asiento": int(stock.get("asiento", 0)),
     }
 
 
-def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+def IngresarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock):
+    '''Solicita los datos de un nuevo espectaculo y lo agrega al sistema'''
     espectaculo = PedirNombre("Ingrese el Espectaculo: ")
-    if espectaculo in listaEspectaculos:
+    if espectaculo in diccionarioEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
         return
     fecha = PedirFecha()
@@ -180,14 +193,32 @@ def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStoc
     while stock["vip"] + stock["campo"] + stock["asiento"] < 1:
         print("Debe ingresar al menos 1 entrada en total entre VIP, Campo y Asiento.")
         stock = PedirStockPorZonas("Ingrese nuevamente la cantidad de entradas por ubicacion:")
-    AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, espectaculo, fecha, precio, stock)
+    AgregarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, espectaculo, fecha, precio, stock)
     print("Espectaculo ingresado.")
 
 
-def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
-    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+def ReembolsarComprasDeEspectaculo(espectaculo, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Elimina las compras asociadas a un espectaculo e indica si se reembolsaron clientes'''
+    hubo_reembolsos = False
+    i = len(listaCompras) - 1
+    while i >= 0:
+        if listaCompras[i] == espectaculo:
+            hubo_reembolsos = True
+            del listaClientes[i]
+            del listaCompras[i]
+            del listaCantidades[i]
+            del listaZonas[i]
+            del listaZonasClaves[i]
+            del listaTotales[i]
+        i = i - 1
+    return hubo_reembolsos
+
+
+def EliminarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Elimina un espectaculo tras confirmar y reembolsa sus compras asociadas'''
+    VerEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
     espectaculo = PedirNombre("Ingrese el espectaculo que desea eliminar (nombre): ")
-    if espectaculo not in listaEspectaculos:
+    if espectaculo not in diccionarioEspectaculos:
         print("No se encontro el espectaculo.")
         return
     confirmacionextra = input("Esta seguro? (Si o No): ")
@@ -196,11 +227,22 @@ def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStoc
         confirmacionextra = input("Respuesta incorrecta (Responda 'Si' o 'No'): ")
         confirmacionextra = confirmacionextra.lower()
     if confirmacionextra == "si":
-        del listaEspectaculos[espectaculo]
-        del listaFechas[espectaculo]
-        del listaPrecios[espectaculo]
-        del listaStock[espectaculo]
+        reembolso_realizado = ReembolsarComprasDeEspectaculo(
+            espectaculo,
+            listaClientes,
+            listaCompras,
+            listaCantidades,
+            listaZonas,
+            listaZonasClaves,
+            listaTotales,
+        )
+        del diccionarioEspectaculos[espectaculo]
+        del diccionarioFechas[espectaculo]
+        del diccionarioPrecios[espectaculo]
+        del diccionarioStock[espectaculo]
         print("Espectaculo eliminado.")
+        if reembolso_realizado:
+            print("Se reembolso correctamente a los clientes relacionados a este espectaculo.")
     if confirmacionextra == "no":
         print("Espectaculo no eliminado")
         return
@@ -214,38 +256,42 @@ def ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio=0):
         ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio + 1)
 
 
-def ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, viejo):
+def ModificarNombre(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaCompras, viejo):
+    '''Cambia el nombre de un espectaculo y actualiza las compras existentes'''
     nuevo = PedirNombre("Ingrese el nombre nuevo del espectaculo: ")
-    if nuevo != viejo and nuevo in listaEspectaculos:
+    if nuevo != viejo and nuevo in diccionarioEspectaculos:
         print("Ya existe un espectaculo con ese nombre.")
         return
     if nuevo != viejo:
-        listaEspectaculos[nuevo] = nuevo
-        listaFechas[nuevo] = listaFechas[viejo]
-        listaPrecios[nuevo] = listaPrecios[viejo]
-        listaStock[nuevo] = listaStock[viejo]
-        del listaEspectaculos[viejo]
-        del listaFechas[viejo]
-        del listaPrecios[viejo]
-        del listaStock[viejo]
+        diccionarioEspectaculos[nuevo] = nuevo
+        diccionarioFechas[nuevo] = diccionarioFechas[viejo]
+        diccionarioPrecios[nuevo] = diccionarioPrecios[viejo]
+        diccionarioStock[nuevo] = diccionarioStock[viejo]
+        del diccionarioEspectaculos[viejo]
+        del diccionarioFechas[viejo]
+        del diccionarioPrecios[viejo]
+        del diccionarioStock[viejo]
         ActualizarNombreEnCompras(listaCompras, viejo, nuevo)
     print("Nombre modificado.")
 
 
-def ModificarFecha(listaFechas, espectaculo):
+def ModificarFecha(diccionarioFechas, espectaculo):
+    '''Actualiza la fecha de un espectaculo existente'''
     print("A continuacion ingrese nuevamente la fecha:")
-    listaFechas[espectaculo] = PedirFecha()
+    diccionarioFechas[espectaculo] = PedirFecha()
 
 
-def ModificarPrecio(listaPrecios, espectaculo):
+def ModificarPrecio(diccionarioPrecios, espectaculo):
+    '''Actualiza el precio base de entrada de un espectaculo existente'''
     print("Ingrese a continuacion el nuevo precio base:")
-    listaPrecios[espectaculo] = PedirPrecio("Ingresar precio: ")
+    diccionarioPrecios[espectaculo] = PedirPrecio("Ingresar precio: ")
 
 
-def ModificarStock(listaStock, espectaculo):
+def ModificarStock(diccionarioStock, espectaculo):
+    '''Reemplaza o suma entradas disponibles en un sector de un espectaculo'''
     for codigo in ZONAS:
         zona = ZONAS[codigo]
-        print("  " + str(codigo) + " - " + zona["nombre"] + " (Actual: " + str(listaStock[espectaculo][zona["clave"]]) + ")")
+        print("  " + str(codigo) + " - " + zona["nombre"] + " (Actual: " + str(diccionarioStock[espectaculo][zona["clave"]]) + ")")
     zona_cod = PedirEntero("Seleccione el sector a modificar (1-3): ")
     while zona_cod not in ZONAS:
         print("Sector inexistente.")
@@ -262,23 +308,24 @@ def ModificarStock(listaStock, espectaculo):
         while cantidad < 0:
             print("El stock no puede ser negativo.")
             cantidad = PedirEntero("Ingrese la nueva cantidad para " + clave.upper() + " (minimo 0): ")
-        listaStock[espectaculo][clave] = cantidad
+        diccionarioStock[espectaculo][clave] = cantidad
     else:
         cantidad = PedirEntero("Ingrese la cantidad a sumar para " + clave.upper() + " (minimo 1): ")
         while cantidad < 1:
             print("La cantidad a sumar debe ser como minimo 1.")
             cantidad = PedirEntero("Ingrese la cantidad a sumar para " + clave.upper() + " (minimo 1): ")
-        listaStock[espectaculo][clave] = listaStock[espectaculo][clave] + cantidad
+        diccionarioStock[espectaculo][clave] = diccionarioStock[espectaculo][clave] + cantidad
 
 
-def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras):
-    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+def ModificarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaCompras):
+    '''Permite elegir un espectaculo y modificar su nombre, fecha, precio o stock'''
+    VerEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
     print()
-    if len(listaEspectaculos) == 0:
+    if len(diccionarioEspectaculos) == 0:
         print("No se ingresaron espectaculos")
         return
     espectaculo = PedirNombre("¿Que espectaculo desea modificar?: ")
-    if espectaculo not in listaEspectaculos:
+    if espectaculo not in diccionarioEspectaculos:
         print("No se encontro el espectaculo.")
         return
     MenuModificaciones()
@@ -287,29 +334,29 @@ def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStoc
         print("Opcion inexistente.")
         opcion = PedirEntero("Ingrese una opcion: ")
     if opcion == 1:
-        ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, espectaculo)
+        ModificarNombre(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaCompras, espectaculo)
     elif opcion == 2:
-        ModificarFecha(listaFechas, espectaculo)
+        ModificarFecha(diccionarioFechas, espectaculo)
     elif opcion == 3:
-        ModificarPrecio(listaPrecios, espectaculo)
+        ModificarPrecio(diccionarioPrecios, espectaculo)
     else:
-        ModificarStock(listaStock, espectaculo)
+        ModificarStock(diccionarioStock, espectaculo)
 
 
-def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, listaFechas):
+def VenderEntradas(diccionarioEspectaculos, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, diccionarioFechas):
     '''Registra la venta de entradas segun ubicacion en el estadio, descuenta stock del sector y calcula el total'''
-    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    VerEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
     espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas: ")
-    if espectaculo not in listaEspectaculos:
+    if espectaculo not in diccionarioEspectaculos:
         print("No se encontro el espectaculo.")
         return
 
-    stock_esp = listaStock[espectaculo]
+    stock_esp = diccionarioStock[espectaculo]
     if stock_esp["vip"] + stock_esp["campo"] + stock_esp["asiento"] == 0:
         print("No quedan entradas disponibles en ningun sector para este espectaculo.")
         return
 
-    MenuZonas(listaPrecios[espectaculo], stock_esp)
+    MenuZonas(diccionarioPrecios[espectaculo], stock_esp)
     zona_cod = PedirEntero("Seleccione la ubicacion (1-3): ")
     while zona_cod not in ZONAS:
         print("Ubicacion inexistente.")
@@ -327,7 +374,7 @@ def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, l
         print("La cantidad debe ser de al menos 1 y no puede superar las disponibles en el sector (" + str(disponible_zona) + ").")
         cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
 
-    precio_unitario = round(float(listaPrecios[espectaculo]) * float(ZONAS[zona_cod]["multiplicador"]), 2)
+    precio_unitario = round(float(diccionarioPrecios[espectaculo]) * float(ZONAS[zona_cod]["multiplicador"]), 2)
     total = round(precio_unitario * cantidad, 2)
 
     stock_esp[clave_zona] = disponible_zona - cantidad
@@ -341,7 +388,7 @@ def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, l
     print("Venta realizada en " + ZONAS[zona_cod]["nombre"] + ". Total a pagar: $" + str(total))
 
 
-def ReembolsarEntrada(listaEspectaculos, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+def ReembolsarEntrada(diccionarioEspectaculos, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
     '''Reembolsa una compra existente, devuelve entradas al stock del sector correspondiente y elimina el registro'''
     if len(listaClientes) == 0:
         print("No hay compras registradas para reembolsar.")
@@ -380,8 +427,8 @@ def ReembolsarEntrada(listaEspectaculos, listaStock, listaClientes, listaCompras
     clave_zona = listaZonasClaves[idx_real]
     monto = float(listaTotales[idx_real])
 
-    if espectaculo in listaStock and clave_zona in listaStock[espectaculo]:
-        listaStock[espectaculo][clave_zona] = listaStock[espectaculo][clave_zona] + cantidad
+    if espectaculo in diccionarioStock and clave_zona in diccionarioStock[espectaculo]:
+        diccionarioStock[espectaculo][clave_zona] = diccionarioStock[espectaculo][clave_zona] + cantidad
 
     del listaClientes[idx_real]
     del listaCompras[idx_real]
@@ -414,16 +461,88 @@ def VerClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaT
     print()
 
 
-def GuardarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+def GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock):
+    '''Guarda los espectaculos y su stock en el archivo espectaculos.txt'''
+    with open("espectaculos.txt", "w", encoding="utf-8") as archivo:
+        for espectaculo in diccionarioEspectaculos:
+            stock_esp = diccionarioStock[espectaculo]
+            archivo.write(espectaculo + "\n")
+            archivo.write(diccionarioFechas[espectaculo] + "\n")
+            archivo.write(str(float(diccionarioPrecios[espectaculo])) + "\n")
+            archivo.write(str(stock_esp["vip"]) + "," + str(stock_esp["campo"]) + "," + str(stock_esp["asiento"]) + "\n")
+
+
+def CargarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock):
+    '''Carga los espectaculos almacenados desde espectaculos.txt'''
+    try:
+        with open("espectaculos.txt", "r", encoding="utf-8") as archivo:
+            while True:
+                nombre = archivo.readline().strip()
+                if nombre == "":
+                    break
+                fecha = archivo.readline().strip()
+                precio = float(archivo.readline().strip())
+                stock_linea = archivo.readline().strip()
+                partes = stock_linea.split(",")
+                if len(partes) == 3:
+                    stock_dict = {
+                        "vip": int(partes[0]),
+                        "campo": int(partes[1]),
+                        "asiento": int(partes[2]),
+                    }
+                else:
+                    stock_dict = {"vip": 0, "campo": 0, "asiento": int(stock_linea)}
+                AgregarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, nombre, fecha, precio, stock_dict)
+    except FileNotFoundError:
+        print("No existe el archivo, se inicia vacio.")
+
+
+def GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Guarda las compras de los clientes en el archivo clientes.txt'''
+    with open("clientes.txt", "w", encoding="utf-8") as archivo:
+        for i in range(len(listaClientes)):
+            archivo.write(listaClientes[i] + "\n")
+            archivo.write(listaCompras[i] + "\n")
+            archivo.write(str(listaCantidades[i]) + "\n")
+            archivo.write(listaZonas[i] + "\n")
+            archivo.write(listaZonasClaves[i] + "\n")
+            archivo.write(str(float(listaTotales[i])) + "\n")
+
+
+def CargarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Carga las compras de clientes almacenadas desde clientes.txt'''
+    try:
+        with open("clientes.txt", "r", encoding="utf-8") as archivo:
+            while True:
+                cliente = archivo.readline().strip()
+                if cliente == "":
+                    break
+                espectaculo = archivo.readline().strip()
+                cantidad = int(archivo.readline().strip())
+                zona = archivo.readline().strip()
+                zona_clave = archivo.readline().strip()
+                total_texto = archivo.readline().strip()
+                total = float(total_texto) if total_texto != "" else 0.0
+                listaClientes.append(cliente)
+                listaCompras.append(espectaculo)
+                listaCantidades.append(cantidad)
+                listaZonas.append(zona if zona != "" else ZONAS[3]["nombre"])
+                listaZonasClaves.append(zona_clave if zona_clave != "" else "asiento")
+                listaTotales.append(total)
+    except FileNotFoundError:
+        print("No existe el archivo de clientes, se inicia vacio.")
+
+
+def GuardarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
     '''Guarda cada registro en formato JSON Lines (un objeto JSON por linea)'''
     with open("backup_sistema.jsonl", "w", encoding="utf-8") as archivo:
-        for espectaculo in listaEspectaculos:
+        for espectaculo in diccionarioEspectaculos:
             registro_esp = {
                 "tipo": "espectaculo",
                 "nombre": espectaculo,
-                "fecha": listaFechas[espectaculo],
-                "precio_base": float(listaPrecios[espectaculo]),
-                "stock": listaStock[espectaculo],
+                "fecha": diccionarioFechas[espectaculo],
+                "precio_base": float(diccionarioPrecios[espectaculo]),
+                "stock": diccionarioStock[espectaculo],
             }
             archivo.write(json.dumps(registro_esp, ensure_ascii=False) + "\n")
 
@@ -442,17 +561,17 @@ def GuardarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock,
     print("Backup guardado exitosamente en 'backup_sistema.jsonl'")
 
 
-def CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+def CargarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
     '''Lee 'backup_sistema.jsonl' linea por linea para evitar cargar un bloque gigante en memoria'''
     try:
-        for clave in list(listaEspectaculos.keys()):
-            del listaEspectaculos[clave]
-        for clave in list(listaFechas.keys()):
-            del listaFechas[clave]
-        for clave in list(listaPrecios.keys()):
-            del listaPrecios[clave]
-        for clave in list(listaStock.keys()):
-            del listaStock[clave]
+        for clave in list(diccionarioEspectaculos.keys()):
+            del diccionarioEspectaculos[clave]
+        for clave in list(diccionarioFechas.keys()):
+            del diccionarioFechas[clave]
+        for clave in list(diccionarioPrecios.keys()):
+            del diccionarioPrecios[clave]
+        for clave in list(diccionarioStock.keys()):
+            del diccionarioStock[clave]
         while len(listaClientes) > 0:
             del listaClientes[0]
         while len(listaCompras) > 0:
@@ -491,10 +610,10 @@ def CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, 
                     else:
                         stock_dict = {"vip": 0, "campo": 0, "asiento": int(stock_raw)}
                     AgregarEspectaculo(
-                        listaEspectaculos,
-                        listaFechas,
-                        listaPrecios,
-                        listaStock,
+                        diccionarioEspectaculos,
+                        diccionarioFechas,
+                        diccionarioPrecios,
+                        diccionarioStock,
                         nombre,
                         registro["fecha"],
                         float(registro["precio_base"]),
@@ -517,79 +636,12 @@ def CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, 
         print("No se encontro ningun archivo de respaldo ('backup_sistema.jsonl').")
 
 
-def GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
-    with open("espectaculos.txt", "w", encoding="utf-8") as archivo:
-        for espectaculo in listaEspectaculos:
-            stock_esp = listaStock[espectaculo]
-            archivo.write(espectaculo + "\n")
-            archivo.write(listaFechas[espectaculo] + "\n")
-            archivo.write(str(float(listaPrecios[espectaculo])) + "\n")
-            archivo.write(str(stock_esp["vip"]) + "," + str(stock_esp["campo"]) + "," + str(stock_esp["asiento"]) + "\n")
-
-
-def CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
-    try:
-        with open("espectaculos.txt", "r", encoding="utf-8") as archivo:
-            while True:
-                nombre = archivo.readline().strip()
-                if nombre == "":
-                    break
-                fecha = archivo.readline().strip()
-                precio = float(archivo.readline().strip())
-                stock_linea = archivo.readline().strip()
-                partes = stock_linea.split(",")
-                if len(partes) == 3:
-                    stock_dict = {
-                        "vip": int(partes[0]),
-                        "campo": int(partes[1]),
-                        "asiento": int(partes[2]),
-                    }
-                else:
-                    stock_dict = {"vip": 0, "campo": 0, "asiento": int(stock_linea)}
-                AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock_dict)
-    except FileNotFoundError:
-        print("No existe el archivo, se inicia vacio.")
-
-
-def GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
-    with open("clientes.txt", "w", encoding="utf-8") as archivo:
-        for i in range(len(listaClientes)):
-            archivo.write(listaClientes[i] + "\n")
-            archivo.write(listaCompras[i] + "\n")
-            archivo.write(str(listaCantidades[i]) + "\n")
-            archivo.write(listaZonas[i] + "\n")
-            archivo.write(listaZonasClaves[i] + "\n")
-            archivo.write(str(float(listaTotales[i])) + "\n")
-
-
-def CargarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
-    try:
-        with open("clientes.txt", "r", encoding="utf-8") as archivo:
-            while True:
-                cliente = archivo.readline().strip()
-                if cliente == "":
-                    break
-                espectaculo = archivo.readline().strip()
-                cantidad = int(archivo.readline().strip())
-                zona = archivo.readline().strip()
-                zona_clave = archivo.readline().strip()
-                total_texto = archivo.readline().strip()
-                total = float(total_texto) if total_texto != "" else 0.0
-                listaClientes.append(cliente)
-                listaCompras.append(espectaculo)
-                listaCantidades.append(cantidad)
-                listaZonas.append(zona if zona != "" else ZONAS[3]["nombre"])
-                listaZonasClaves.append(zona_clave if zona_clave != "" else "asiento")
-                listaTotales.append(total)
-    except FileNotFoundError:
-        print("No existe el archivo de clientes, se inicia vacio.")
-
-
 def Programa():
-    listaEspectaculos = {}
-    listaFechas = {}
-    listaPrecios = {}
-    listaStock = {}
+    '''Ejecuta el bucle principal del sistema de venta de entradas'''
+    diccionarioEspectaculos = {}
+    diccionarioFechas = {}
+    diccionarioPrecios = {}
+    diccionarioStock = {}
     listaClientes = []
     listaCompras = []
     listaCantidades = []
@@ -598,7 +650,7 @@ def Programa():
     listaTotales = []
     terminar = False
 
-    CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    CargarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
     CargarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
 
     while not terminar:
@@ -609,30 +661,31 @@ def Programa():
             Menu()
             opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
         if opcion == 1:
-            VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            VerEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
         elif opcion == 2:
-            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            IngresarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
         elif opcion == 3:
-            EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
-            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            EliminarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 4:
-            ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras)
-            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            ModificarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaCompras)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
         elif opcion == 5:
-            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, listaFechas)
-            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            VenderEntradas(diccionarioEspectaculos, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, diccionarioFechas)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
             GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 6:
             VerClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales)
         elif opcion == 7:
-            ReembolsarEntrada(listaEspectaculos, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
-            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            ReembolsarEntrada(diccionarioEspectaculos, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
             GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 8:
-            GuardarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+            GuardarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 9:
-            CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+            CargarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         else:
             print("Terminando programa...")
             terminar = True

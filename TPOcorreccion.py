@@ -90,7 +90,7 @@ def PedirPrecio(mensaje):
 
 
 def VerificarFormatoFecha(dia, mes, año):
-    if año < 2026 or mes < 1 or mes > 12:
+    if año < 2027 or mes < 1 or mes > 12:
         return False
     if mes == 2:
         if (año % 4 == 0 and año % 100 != 0) or año % 400 == 0:

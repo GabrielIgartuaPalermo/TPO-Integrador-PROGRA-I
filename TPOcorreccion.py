@@ -1,31 +1,51 @@
-#Sistema de Venta de entradas para Espectaculos
+import json
 
-#FUNCIONES
-def Menu ():
-    '''Muestra el menu principal de opciones en pantalla'''
+# Sistema de Venta de entradas para Espectaculos en Estadio General
+
+ZONAS = {
+    1: {"clave": "vip", "nombre": "VIP (mejor ubicacion y comodidades)", "multiplicador": 1.8},
+    2: {"clave": "campo", "nombre": "Campo (cerca del escenario / zona baja)", "multiplicador": 1.4},
+    3: {"clave": "asiento", "nombre": "Asiento (ubicacion con butaca / grada)", "multiplicador": 1.0},
+}
+
+
+def Menu():
     print()
     print("================= MENU =================")
-    print("  1 - Ver espectaculos")
+    print("  1 - Ver Espectaculos")
     print("  2 - Ingresar Espectaculo")
-    print("  3 - Comprar tickets de entrada")
-    print("  4 - Ingresar Cliente")
-    print("  5 - Ver Clientes")
-    print("  6 - Salir")
+    print("  3 - Eliminar Espectaculo")
+    print("  4 - Modificar Espectaculo")
+    print("  5 - Vender Entradas")
+    print("  6 - Ver Clientes")
+    print("  7 - Reembolsar Entrada")
+    print("  8 - Guardar Backup (JSONL)")
+    print("  9 - Restaurar desde Backup (JSONL)")
+    print(" 10 - Salir")
     print("========================================")
 
-def VerEspectaculos(espectaculos,fechaespectaculos):
-    '''Imprime la lista de espectaculos registrados con sus fechas'''
+
+def MenuModificaciones():
+    print("1-Nombre")
+    print("- - - - ")
+    print("2-Fecha")
+    print("- - - - ")
+    print("3-PrecioEntrada")
+    print("- - - - - - - - -")
+    print("4-Stock")
+
+
+def MenuZonas(precio_base, stock_esp):
     print()
-    print("============ ESPECTACULOS =============")
-    for i in range(len(espectaculos)):
-        numero = str(i + 1)
-        print("   ", numero + "- [ " + espectaculos[i] + " - " + fechaespectaculos[i] + " ]")
-    if len(espectaculos) == 0:
-        print()
-        print("                  No se ingresaron espectaculos")
-        print()
-    print("=======================================")
-    print()
+    print("---------- UBICACIONES DEL ESTADIO ----------")
+    for codigo in ZONAS:
+        zona = ZONAS[codigo]
+        clave = zona["clave"]
+        precio_ubicacion = round(precio_base * zona["multiplicador"], 2)
+        disponibles = stock_esp.get(clave, 0)
+        print("  " + str(codigo) + " - " + zona["nombre"] + " -> $" + str(precio_ubicacion) + " c/u (Disponibles: " + str(disponibles) + ")")
+    print("---------------------------------------------")
+
 
 def validar_formato(formato):
     '''Verifica que un texto ingrese unicamente caracteres numericos y no este vacio'''
@@ -37,185 +57,588 @@ def validar_formato(formato):
             return False
     return True
 
-def PedirEntero(mensaje):
-    '''Usa validar_formato para pedir un input hasta que sea solo numerico y lo convierte a int'''
-    texto = input(mensaje)
-    while validar_formato(texto) == False:
-        texto = input("Error. Ingrese unicamente numeros validos: ")
-    return int(texto)
 
-def VerificarFormatoFecha(diad,mesm,añoa):
-    '''Valida que el dia, mes y año sean valores correctos y devuelve la fecha valida'''
-    while añoa < 2026:
-        añoa = PedirEntero("Error. Ingresar un año que sea 2026 o en adelante: ")
-    while mesm < 1 or mesm > 12:
-        mesm = PedirEntero("Mes invalido, ingresar nuevamente el mes (1-12): ")
-    if mesm == 2:
-        if (añoa % 4 == 0 and añoa % 100 != 0) or (añoa % 400 == 0):
+def PedirEntero(mensaje):
+    texto = input(mensaje).strip()
+    if validar_formato(texto):
+        return int(texto)
+    else:
+        print("Ingrese un numero entero.")
+        return PedirEntero(mensaje)
+
+
+def PedirNombre(mensaje):
+    nombre = input(mensaje).strip().lower()
+    if nombre != "":
+        return nombre
+    else:
+        print("El nombre no puede estar vacio.")
+        return PedirNombre(mensaje)
+
+
+def PedirPrecio(mensaje):
+    try:
+        precio = float(input(mensaje).strip().replace(",", "."))
+    except ValueError:
+        print("Ingrese un precio numerico.")
+        return PedirPrecio(mensaje)
+    if precio > 0:
+        return precio
+    else:
+        print("El precio debe ser mayor que cero.")
+        return PedirPrecio(mensaje)
+
+
+def VerificarFormatoFecha(dia, mes, año):
+    if año < 2026 or mes < 1 or mes > 12:
+        return False
+    if mes == 2:
+        if (año % 4 == 0 and año % 100 != 0) or año % 400 == 0:
             max_dias = 29
         else:
             max_dias = 28
-    elif mesm == 4 or mesm == 6 or mesm == 9 or mesm == 11:
+    elif mes == 4 or mes == 6 or mes == 9 or mes == 11:
         max_dias = 30
     else:
         max_dias = 31
-    while diad < 1 or diad > max_dias:
-        diad = PedirEntero(f"Dia invalido, ingresar un dia entre 1 y {max_dias}: ")
-    return diad, mesm, añoa
+    if dia < 1 or dia > max_dias:
+        return False
+    return True
 
-def Armar_Fecha_Completa(d, m, a):
-    '''Convierte dia mes y año en un texto en formato dia mes año con separadores'''
-    return "/".join(map(str, (d, m, a)))
 
-def GuardarFechaEspectaculo (diad,mesm,añoa,espectaculos):
-    '''Genera la fecha formateada y la guarda en la lista de fechas'''
-    fecha = Armar_Fecha_Completa(diad, mesm, añoa)
-    espectaculos.append(fecha)
+def Armar_Fecha_Completa(dia, mes, año):
+    return str(dia) + "/" + str(mes) + "/" + str(año)
 
-def ContinuarPrograma(seguir):
-    '''Valida y normaliza la respuesta del usuario para continuar o no el programa'''
-    while seguir.lower() != "si" and seguir.lower() != "no":
-        seguir = input('Error. La respuesta no es ni "Si" ni "No", Intente de nuevo: ')
-    if seguir.lower() == "no":
-        seguir="No"
-        return seguir
+
+def PedirFecha():
+    dia = PedirEntero("Ingrese el dia del mes: ")
+    mes = PedirEntero("Ingrese el mes: ")
+    año = PedirEntero("Ingrese el año: ")
+    if VerificarFormatoFecha(dia, mes, año):
+        return Armar_Fecha_Completa(dia, mes, año)
     else:
-        seguir="Si"
-        return seguir
+        print("La fecha ingresada no es valida.")
+        return PedirFecha()
 
-def imprimirmatriz(matriz):
-    '''Muestra en pantalla la matriz de asientos con formato de columnas'''
-    filas = len(matriz)
-    columnas = len(matriz[0])
-    for f in range(filas):
-        for c in range(columnas):
-            print("%6d" %matriz[f][c], end="")
+
+def PedirStockPorZonas(mensaje_intro):
+    print(mensaje_intro)
+    stock_zonas = {}
+    for codigo in ZONAS:
+        clave = ZONAS[codigo]["clave"]
+        cant = PedirEntero("  Cantidad para " + clave.upper() + " (minimo 0): ")
+        while cant < 0:
+            print("  La cantidad no puede ser negativa.")
+            cant = PedirEntero("  Cantidad para " + clave.upper() + " (minimo 0): ")
+        stock_zonas[clave] = cant
+    return stock_zonas
+
+
+def FormatearStock(stock_esp):
+    return (
+        "VIP: " + str(stock_esp.get("vip", 0))
+        + " | Campo: " + str(stock_esp.get("campo", 0))
+        + " | Asiento: " + str(stock_esp.get("asiento", 0))
+    )
+
+
+def VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+    '''Imprime la lista de espectaculos registrados con sus fechas, precios base y stock por sector'''
+    print()
+    print("============ ESPECTACULOS =============")
+    numero = 1
+    for espectaculo in listaEspectaculos:
+        print("   " + str(numero) + "- [ " + espectaculo + " - " + listaFechas[espectaculo] + " - Base: $" + str(listaPrecios[espectaculo]) + " - " + FormatearStock(listaStock[espectaculo]) + " ]")
+        numero = numero + 1
+    if len(listaEspectaculos) == 0:
         print()
-
-def VerClientes(listaclientes):
-    '''Imprime en pantalla la lista de clientes registrados'''
-    print()
-    print("====== LISTA DE CLIENTES ======")
-    for i in range(len(listaclientes)):
-        numero = str(i + 1)
-        print(numero + "- [ " + listaclientes[i] + " ]")
-    if len(listaclientes) == 0:
-        print(" -No se encontraron clientes")
-    print("=============================")
+        print("No se ingresaron espectaculos")
+        print()
+    print("=======================================")
     print()
 
-def VerificarValorMatriz(valor):
-    '''Valida que el valor ingresado para fila o columna este entre 1 y 10'''
-    while valor > 10 or valor < 1:
-        valor=PedirEntero("Error. Ingrese un valor correcto (entre 1 y 10): ")
-    return valor
 
-#Listas 
-Clientes = []
-ListaEspectaculosEspectaculos = [] 
-FechasEspectaculos = []
-ListaDeAsientos=[]
-ListaDeCampo=[]
+def AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock):
+    listaEspectaculos[nombre] = nombre
+    listaFechas[nombre] = fecha
+    listaPrecios[nombre] = float(precio)
+    listaStock[nombre] = {
+        "vip": int(stock.get("vip", 0)),
+        "campo": int(stock.get("campo", 0)),
+        "asiento": int(stock.get("asiento", 0)),
+    }
 
-#Variables Globales
-seguir = "Si"
 
-#MAIN
-while seguir != "No":
-    Menu()
-    opcion = PedirEntero("Ingresar una opcion: ")
-    print("-----------------------------------------------------------------------")
-    while opcion > 6 or opcion < 1:
-        Menu()
-        opcion=PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
-    if opcion == 1: 
-        VerEspectaculos(ListaEspectaculosEspectaculos,FechasEspectaculos)
-    if opcion == 2:
-        espectaculo = input("Ingresar un espectaculo:")
-        while espectaculo.strip() == "": 
-            espectaculo = input("Error. El nombre no puede estar vacío, ingresa un espectaculo de nuevo:")
-        espectaculo=espectaculo.upper()
-        ListaEspectaculosEspectaculos.append(espectaculo)
-        nuevamatriz = [[0 for c in range(10)] for f in range(10)]
-        ListaDeAsientos.append(nuevamatriz)
-        ListaDeCampo.append(0)
-        print("A continuacion ingresar en formato D/M/A la fecha")
-        dia = PedirEntero("Ingrese dia de 1 a 31: ")
-        mes = PedirEntero("Ingrese mes del 1 al 12: ")
-        año = PedirEntero("Ingrese año del 2026 en adelante: ")
-        dia, mes, año = VerificarFormatoFecha(dia,mes,año)
-        GuardarFechaEspectaculo(dia,mes,año,FechasEspectaculos)
-    if opcion == 3:
-        if len(ListaEspectaculosEspectaculos) == 0:
-            print("  -No se ingresaron espectaculos")
-            print("=====================================")
-        else:
-            print("Espectaculos disponibles:")
-            for i in range(len(ListaEspectaculosEspectaculos)):
-                print(i + 1, "-", ListaEspectaculosEspectaculos[i])
-            num_esp = PedirEntero("Seleccione el numero de espectaculo que desea ver: ")
-            while num_esp < 1 or num_esp > len(ListaEspectaculosEspectaculos):
-                num_esp = PedirEntero("Error. Seleccione un numero valido de la lista: ")
-            indiceespectaculo = num_esp - 1
-            asientos = ListaDeAsientos[indiceespectaculo]
-            print("¿Qué zona desea comprar?")
-            print("1 - Platea / Asientos")
-            print("2 - Campo (Pie)")
-            tipozona = PedirEntero("Seleccione una opción (1 o 2): ")
-            while tipozona not in [1, 2]:
-                tipozona = PedirEntero("Opción inválida. Ingrese 1 para Asientos o 2 para Campo: ")
-            if tipozona == 1:
-                print("A continuacion se mostrara los asientos disponibles:")
-                print("--------------------------------------------------------------")
-                imprimirmatriz(asientos)
-                print("--------------------------------------------------------------")
-                deseacomprar = input("Desea comprar? (Responda Si o No): ")
-                deseacomprar = ContinuarPrograma(deseacomprar)
-                if deseacomprar == "Si":
-                    filacomprar = PedirEntero("¿En que fila desea comprar su asiento?: ")
-                    filacomprar = VerificarValorMatriz(filacomprar)
-                    columnacomprar = PedirEntero("¿En que columna desea comprar su asiento?: ")
-                    columnacomprar = VerificarValorMatriz(columnacomprar)
-                    print("--------------------------------------------------------------------")
-                    while asientos[filacomprar - 1][columnacomprar - 1] == 1:
-                        print("Error. La entrada ya ha sido vendida, Pruebe con otra.")
-                        filacomprar = PedirEntero("¿En que fila desea comprar su asiento?: ")
-                        filacomprar = VerificarValorMatriz(filacomprar)
-                        columnacomprar = PedirEntero("¿En que columna desea comprar su asiento?: ")
-                        columnacomprar = VerificarValorMatriz(columnacomprar)
-                        print("--------------------------------------------------------------------")  
-                    precioentrada = 110000 - (filacomprar * 5000)
-                    print(f"El precio de la entrada es de {precioentrada} pesos argentinos")
-                    deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
-                    deseacomprar = ContinuarPrograma(deseacomprar)
-                    if deseacomprar == "Si":
-                        asientos[filacomprar - 1][columnacomprar - 1] = 1
-                        print("Asiento reservado con exito")
-            elif tipozona == 2:
-                vendidosactuales = ListaDeCampo[indiceespectaculo]
-                if vendidosactuales >= 50:
-                    print("Lo sentimos, el Campo para este espectaculo esta agotado (50/50).")
+def IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+    espectaculo = PedirNombre("Ingrese el Espectaculo: ")
+    if espectaculo in listaEspectaculos:
+        print("Ya existe un espectaculo con ese nombre.")
+        return
+    fecha = PedirFecha()
+    precio = PedirPrecio("Ingrese el precio base de la entrada (referencia Asiento): ")
+    stock = PedirStockPorZonas("Ingrese la cantidad de entradas por ubicacion:")
+    while stock["vip"] + stock["campo"] + stock["asiento"] < 1:
+        print("Debe ingresar al menos 1 entrada en total entre VIP, Campo y Asiento.")
+        stock = PedirStockPorZonas("Ingrese nuevamente la cantidad de entradas por ubicacion:")
+    AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, espectaculo, fecha, precio, stock)
+    print("Espectaculo ingresado.")
+
+
+def EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    espectaculo = PedirNombre("Ingrese el espectaculo que desea eliminar (nombre): ")
+    if espectaculo not in listaEspectaculos:
+        print("No se encontro el espectaculo.")
+        return
+    confirmacionextra = input("Esta seguro? (Si o No): ")
+    confirmacionextra = confirmacionextra.lower()
+    while confirmacionextra != "si" and confirmacionextra != "no":
+        confirmacionextra = input("Respuesta incorrecta (Responda 'Si' o 'No'): ")
+        confirmacionextra = confirmacionextra.lower()
+    if confirmacionextra == "si":
+        del listaEspectaculos[espectaculo]
+        del listaFechas[espectaculo]
+        del listaPrecios[espectaculo]
+        del listaStock[espectaculo]
+        print("Espectaculo eliminado.")
+    if confirmacionextra == "no":
+        print("Espectaculo no eliminado")
+        return
+
+
+def ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio=0):
+    '''Reemplaza el nombre viejo por el nuevo en las compras ya realizadas'''
+    if inicio < len(listaCompras):
+        if listaCompras[inicio] == viejo:
+            listaCompras[inicio] = nuevo
+        ActualizarNombreEnCompras(listaCompras, viejo, nuevo, inicio + 1)
+
+
+def ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, viejo):
+    nuevo = PedirNombre("Ingrese el nombre nuevo del espectaculo: ")
+    if nuevo != viejo and nuevo in listaEspectaculos:
+        print("Ya existe un espectaculo con ese nombre.")
+        return
+    if nuevo != viejo:
+        listaEspectaculos[nuevo] = nuevo
+        listaFechas[nuevo] = listaFechas[viejo]
+        listaPrecios[nuevo] = listaPrecios[viejo]
+        listaStock[nuevo] = listaStock[viejo]
+        del listaEspectaculos[viejo]
+        del listaFechas[viejo]
+        del listaPrecios[viejo]
+        del listaStock[viejo]
+        ActualizarNombreEnCompras(listaCompras, viejo, nuevo)
+    print("Nombre modificado.")
+
+
+def ModificarFecha(listaFechas, espectaculo):
+    print("A continuacion ingrese nuevamente la fecha:")
+    listaFechas[espectaculo] = PedirFecha()
+
+
+def ModificarPrecio(listaPrecios, espectaculo):
+    print("Ingrese a continuacion el nuevo precio base:")
+    listaPrecios[espectaculo] = PedirPrecio("Ingresar precio: ")
+
+
+def ModificarStock(listaStock, espectaculo):
+    for codigo in ZONAS:
+        zona = ZONAS[codigo]
+        print("  " + str(codigo) + " - " + zona["nombre"] + " (Actual: " + str(listaStock[espectaculo][zona["clave"]]) + ")")
+    zona_cod = PedirEntero("Seleccione el sector a modificar (1-3): ")
+    while zona_cod not in ZONAS:
+        print("Sector inexistente.")
+        zona_cod = PedirEntero("Seleccione el sector a modificar (1-3): ")
+    clave = ZONAS[zona_cod]["clave"]
+
+    subopcion = PedirEntero("Ingrese 1 para reemplazar el stock o 2 para sumar stock: ")
+    while subopcion != 1 and subopcion != 2:
+        print("Opcion inexistente.")
+        subopcion = PedirEntero("Ingrese 1 para reemplazar el stock o 2 para sumar stock: ")
+
+    if subopcion == 1:
+        cantidad = PedirEntero("Ingrese la nueva cantidad para " + clave.upper() + " (minimo 0): ")
+        while cantidad < 0:
+            print("El stock no puede ser negativo.")
+            cantidad = PedirEntero("Ingrese la nueva cantidad para " + clave.upper() + " (minimo 0): ")
+        listaStock[espectaculo][clave] = cantidad
+    else:
+        cantidad = PedirEntero("Ingrese la cantidad a sumar para " + clave.upper() + " (minimo 1): ")
+        while cantidad < 1:
+            print("La cantidad a sumar debe ser como minimo 1.")
+            cantidad = PedirEntero("Ingrese la cantidad a sumar para " + clave.upper() + " (minimo 1): ")
+        listaStock[espectaculo][clave] = listaStock[espectaculo][clave] + cantidad
+
+
+def ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras):
+    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    print()
+    if len(listaEspectaculos) == 0:
+        print("No se ingresaron espectaculos")
+        return
+    espectaculo = PedirNombre("¿Que espectaculo desea modificar?: ")
+    if espectaculo not in listaEspectaculos:
+        print("No se encontro el espectaculo.")
+        return
+    MenuModificaciones()
+    opcion = PedirEntero("Ingrese una opcion: ")
+    while opcion < 1 or opcion > 4:
+        print("Opcion inexistente.")
+        opcion = PedirEntero("Ingrese una opcion: ")
+    if opcion == 1:
+        ModificarNombre(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras, espectaculo)
+    elif opcion == 2:
+        ModificarFecha(listaFechas, espectaculo)
+    elif opcion == 3:
+        ModificarPrecio(listaPrecios, espectaculo)
+    else:
+        ModificarStock(listaStock, espectaculo)
+
+
+def VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, listaFechas):
+    '''Registra la venta de entradas segun ubicacion en el estadio, descuenta stock del sector y calcula el total'''
+    VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    espectaculo = PedirNombre("Ingrese el espectaculo del que desea comprar entradas: ")
+    if espectaculo not in listaEspectaculos:
+        print("No se encontro el espectaculo.")
+        return
+
+    stock_esp = listaStock[espectaculo]
+    if stock_esp["vip"] + stock_esp["campo"] + stock_esp["asiento"] == 0:
+        print("No quedan entradas disponibles en ningun sector para este espectaculo.")
+        return
+
+    MenuZonas(listaPrecios[espectaculo], stock_esp)
+    zona_cod = PedirEntero("Seleccione la ubicacion (1-3): ")
+    while zona_cod not in ZONAS:
+        print("Ubicacion inexistente.")
+        zona_cod = PedirEntero("Seleccione la ubicacion (1-3): ")
+
+    clave_zona = ZONAS[zona_cod]["clave"]
+    disponible_zona = stock_esp[clave_zona]
+    if disponible_zona == 0:
+        print("No quedan entradas disponibles en " + ZONAS[zona_cod]["nombre"] + ".")
+        return
+
+    cliente = PedirNombre("Ingrese el nombre del cliente: ")
+    cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
+    while cantidad < 1 or cantidad > disponible_zona:
+        print("La cantidad debe ser de al menos 1 y no puede superar las disponibles en el sector (" + str(disponible_zona) + ").")
+        cantidad = PedirEntero("Ingrese la cantidad de entradas: ")
+
+    precio_unitario = round(float(listaPrecios[espectaculo]) * float(ZONAS[zona_cod]["multiplicador"]), 2)
+    total = round(precio_unitario * cantidad, 2)
+
+    stock_esp[clave_zona] = disponible_zona - cantidad
+    listaClientes.append(cliente)
+    listaCompras.append(espectaculo)
+    listaCantidades.append(cantidad)
+    listaZonas.append(ZONAS[zona_cod]["nombre"])
+    listaZonasClaves.append(clave_zona)
+    listaTotales.append(total)
+
+    print("Venta realizada en " + ZONAS[zona_cod]["nombre"] + ". Total a pagar: $" + str(total))
+
+
+def ReembolsarEntrada(listaEspectaculos, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Reembolsa una compra existente, devuelve entradas al stock del sector correspondiente y elimina el registro'''
+    if len(listaClientes) == 0:
+        print("No hay compras registradas para reembolsar.")
+        return
+
+    cliente_buscado = PedirNombre("Ingrese el nombre del cliente para reembolso: ")
+    coincidencias = []
+    for i in range(len(listaClientes)):
+        if listaClientes[i] == cliente_buscado:
+            coincidencias.append(i)
+
+    if len(coincidencias) == 0:
+        print("No se encontraron compras a nombre de '" + cliente_buscado + "'.")
+        return
+
+    print()
+    print("Compras encontradas para " + cliente_buscado + ":")
+    for pos in range(len(coincidencias)):
+        idx = coincidencias[pos]
+        print("  " + str(pos + 1) + "- " + listaCompras[idx] + " | Ubicacion: " + listaZonas[idx] + " | Entradas: " + str(listaCantidades[idx]) + " | Pagado: $" + str(listaTotales[idx]))
+
+    seleccion = PedirEntero("Ingrese el numero de compra a reembolsar (0 para cancelar): ")
+    if seleccion == 0:
+        print("Reembolso cancelado.")
+        return
+    while seleccion < 1 or seleccion > len(coincidencias):
+        print("Seleccion invalida.")
+        seleccion = PedirEntero("Ingrese el numero de compra a reembolsar (0 para cancelar): ")
+        if seleccion == 0:
+            print("Reembolso cancelado.")
+            return
+
+    idx_real = coincidencias[seleccion - 1]
+    espectaculo = listaCompras[idx_real]
+    cantidad = listaCantidades[idx_real]
+    clave_zona = listaZonasClaves[idx_real]
+    monto = float(listaTotales[idx_real])
+
+    if espectaculo in listaStock and clave_zona in listaStock[espectaculo]:
+        listaStock[espectaculo][clave_zona] = listaStock[espectaculo][clave_zona] + cantidad
+
+    del listaClientes[idx_real]
+    del listaCompras[idx_real]
+    del listaCantidades[idx_real]
+    del listaZonas[idx_real]
+    del listaZonasClaves[idx_real]
+    del listaTotales[idx_real]
+
+    print("Reembolso completado. Se devolvieron " + str(cantidad) + " entrada(s) a " + clave_zona.upper() + " de '" + espectaculo + "' por un total de $" + str(monto) + ".")
+
+
+def ImprimirClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales, inicio=0):
+    '''Imprime un cliente por linea, recorriendo la lista de forma recursiva'''
+    if inicio < len(listaClientes):
+        numero = str(inicio + 1)
+        print("   " + numero + "- [ " + listaClientes[inicio] + " - " + listaCompras[inicio] + " - " + listaZonas[inicio] + " - Entradas: " + str(listaCantidades[inicio]) + " - Total: $" + str(listaTotales[inicio]) + " ]")
+        ImprimirClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales, inicio + 1)
+
+
+def VerClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales):
+    '''Imprime la lista de clientes con el espectaculo, ubicacion, cantidad y total'''
+    print()
+    print("============== CLIENTES ===============")
+    ImprimirClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales)
+    if len(listaClientes) == 0:
+        print()
+        print("No se registraron clientes")
+        print()
+    print("=======================================")
+    print()
+
+
+def GuardarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Guarda cada registro en formato JSON Lines (un objeto JSON por linea)'''
+    with open("backup_sistema.jsonl", "w", encoding="utf-8") as archivo:
+        for espectaculo in listaEspectaculos:
+            registro_esp = {
+                "tipo": "espectaculo",
+                "nombre": espectaculo,
+                "fecha": listaFechas[espectaculo],
+                "precio_base": float(listaPrecios[espectaculo]),
+                "stock": listaStock[espectaculo],
+            }
+            archivo.write(json.dumps(registro_esp, ensure_ascii=False) + "\n")
+
+        for i in range(len(listaClientes)):
+            registro_venta = {
+                "tipo": "venta",
+                "cliente": listaClientes[i],
+                "espectaculo": listaCompras[i],
+                "cantidad": listaCantidades[i],
+                "zona": listaZonas[i],
+                "zona_clave": listaZonasClaves[i],
+                "total": float(listaTotales[i]),
+            }
+            archivo.write(json.dumps(registro_venta, ensure_ascii=False) + "\n")
+
+    print("Backup guardado exitosamente en 'backup_sistema.jsonl'")
+
+
+def CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    '''Lee 'backup_sistema.jsonl' linea por linea para evitar cargar un bloque gigante en memoria'''
+    try:
+        for clave in list(listaEspectaculos.keys()):
+            del listaEspectaculos[clave]
+        for clave in list(listaFechas.keys()):
+            del listaFechas[clave]
+        for clave in list(listaPrecios.keys()):
+            del listaPrecios[clave]
+        for clave in list(listaStock.keys()):
+            del listaStock[clave]
+        while len(listaClientes) > 0:
+            del listaClientes[0]
+        while len(listaCompras) > 0:
+            del listaCompras[0]
+        while len(listaCantidades) > 0:
+            del listaCantidades[0]
+        while len(listaZonas) > 0:
+            del listaZonas[0]
+        while len(listaZonasClaves) > 0:
+            del listaZonasClaves[0]
+        while len(listaTotales) > 0:
+            del listaTotales[0]
+
+        lineas_corruptas = 0
+        with open("backup_sistema.jsonl", "r", encoding="utf-8") as archivo:
+            for linea in archivo:
+                texto = linea.strip()
+                if texto == "":
+                    continue
+                try:
+                    registro = json.loads(texto)
+                except json.JSONDecodeError:
+                    lineas_corruptas = lineas_corruptas + 1
+                    continue
+
+                tipo = registro.get("tipo")
+                if tipo == "espectaculo":
+                    nombre = registro["nombre"]
+                    stock_raw = registro.get("stock", {})
+                    if isinstance(stock_raw, dict):
+                        stock_dict = {
+                            "vip": int(stock_raw.get("vip", 0)),
+                            "campo": int(stock_raw.get("campo", 0)),
+                            "asiento": int(stock_raw.get("asiento", 0)),
+                        }
+                    else:
+                        stock_dict = {"vip": 0, "campo": 0, "asiento": int(stock_raw)}
+                    AgregarEspectaculo(
+                        listaEspectaculos,
+                        listaFechas,
+                        listaPrecios,
+                        listaStock,
+                        nombre,
+                        registro["fecha"],
+                        float(registro["precio_base"]),
+                        stock_dict,
+                    )
+                elif tipo == "venta":
+                    zona_texto = registro.get("zona", ZONAS[3]["nombre"])
+                    clave_guardada = registro.get("zona_clave", "asiento")
+                    listaClientes.append(registro["cliente"])
+                    listaCompras.append(registro["espectaculo"])
+                    listaCantidades.append(int(registro["cantidad"]))
+                    listaZonas.append(zona_texto)
+                    listaZonasClaves.append(clave_guardada)
+                    listaTotales.append(float(registro.get("total", 0.0)))
+
+        print("Sistema restaurado exitosamente desde 'backup_sistema.jsonl'")
+        if lineas_corruptas > 0:
+            print("Aviso: se omitieron " + str(lineas_corruptas) + " linea(s) corrupta(s).")
+    except FileNotFoundError:
+        print("No se encontro ningun archivo de respaldo ('backup_sistema.jsonl').")
+
+
+def GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+    with open("espectaculos.txt", "w", encoding="utf-8") as archivo:
+        for espectaculo in listaEspectaculos:
+            stock_esp = listaStock[espectaculo]
+            archivo.write(espectaculo + "\n")
+            archivo.write(listaFechas[espectaculo] + "\n")
+            archivo.write(str(float(listaPrecios[espectaculo])) + "\n")
+            archivo.write(str(stock_esp["vip"]) + "," + str(stock_esp["campo"]) + "," + str(stock_esp["asiento"]) + "\n")
+
+
+def CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock):
+    try:
+        with open("espectaculos.txt", "r", encoding="utf-8") as archivo:
+            while True:
+                nombre = archivo.readline().strip()
+                if nombre == "":
+                    break
+                fecha = archivo.readline().strip()
+                precio = float(archivo.readline().strip())
+                stock_linea = archivo.readline().strip()
+                partes = stock_linea.split(",")
+                if len(partes) == 3:
+                    stock_dict = {
+                        "vip": int(partes[0]),
+                        "campo": int(partes[1]),
+                        "asiento": int(partes[2]),
+                    }
                 else:
-                    preciocampo = 75000
-                    print("Entradas de campo disponibles: " + str(50 - vendidosactuales) + "/50")
-                    print(f"El precio de la entrada de campo es de {preciocampo} pesos argentinos.")
-                    deseacomprar = input("Quiere realizar la compra? (Si para continuar, No para cancelar): ")
-                    deseacomprar = ContinuarPrograma(deseacomprar)
-                    if deseacomprar == "Si":
-                        ListaDeCampo[indiceespectaculo] += 1
-                        print("Entrada de campo reservada con exito")
-    if opcion == 4:
-        cliente = input("Ingrese su nombre y apellido:")
-        while cliente.strip() == "": 
-            cliente = input("Error. El nombre no puede estar vacío, ingrese su nombre y apellido de nuevo:")
-        cliente=cliente.title()
-        Clientes.append(cliente)
-    if opcion == 5:
-        VerClientes(Clientes)
-    if opcion == 6:
-        seguir="No"
-        print("Terminando programa...")
-        print("=======================================")
-    if opcion != 6:
-        seguir = input("Deseas seguir? (Ingrese Si para seguir o No para no seguir): ")
-        seguir = ContinuarPrograma(seguir)
+                    stock_dict = {"vip": 0, "campo": 0, "asiento": int(stock_linea)}
+                AgregarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, nombre, fecha, precio, stock_dict)
+    except FileNotFoundError:
+        print("No existe el archivo, se inicia vacio.")
+
+
+def GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    with open("clientes.txt", "w", encoding="utf-8") as archivo:
+        for i in range(len(listaClientes)):
+            archivo.write(listaClientes[i] + "\n")
+            archivo.write(listaCompras[i] + "\n")
+            archivo.write(str(listaCantidades[i]) + "\n")
+            archivo.write(listaZonas[i] + "\n")
+            archivo.write(listaZonasClaves[i] + "\n")
+            archivo.write(str(float(listaTotales[i])) + "\n")
+
+
+def CargarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales):
+    try:
+        with open("clientes.txt", "r", encoding="utf-8") as archivo:
+            while True:
+                cliente = archivo.readline().strip()
+                if cliente == "":
+                    break
+                espectaculo = archivo.readline().strip()
+                cantidad = int(archivo.readline().strip())
+                zona = archivo.readline().strip()
+                zona_clave = archivo.readline().strip()
+                total_texto = archivo.readline().strip()
+                total = float(total_texto) if total_texto != "" else 0.0
+                listaClientes.append(cliente)
+                listaCompras.append(espectaculo)
+                listaCantidades.append(cantidad)
+                listaZonas.append(zona if zona != "" else ZONAS[3]["nombre"])
+                listaZonasClaves.append(zona_clave if zona_clave != "" else "asiento")
+                listaTotales.append(total)
+    except FileNotFoundError:
+        print("No existe el archivo de clientes, se inicia vacio.")
+
+
+def Programa():
+    listaEspectaculos = {}
+    listaFechas = {}
+    listaPrecios = {}
+    listaStock = {}
+    listaClientes = []
+    listaCompras = []
+    listaCantidades = []
+    listaZonas = []
+    listaZonasClaves = []
+    listaTotales = []
+    terminar = False
+
+    CargarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+    CargarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+
+    while not terminar:
+        Menu()
+        opcion = PedirEntero("Ingresar una opcion: ")
+        print("-----------------------------------------------------------------------")
+        while opcion > 10 or opcion < 1:
+            Menu()
+            opcion = PedirEntero("Error. La opcion ingresada no existe, intente de nuevo: ")
+        if opcion == 1:
+            VerEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+        elif opcion == 2:
+            IngresarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+        elif opcion == 3:
+            EliminarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+        elif opcion == 4:
+            ModificarEspectaculo(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaCompras)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+        elif opcion == 5:
+            VenderEntradas(listaEspectaculos, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, listaFechas)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+        elif opcion == 6:
+            VerClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaTotales)
+        elif opcion == 7:
+            ReembolsarEntrada(listaEspectaculos, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+            GuardarEspectaculos(listaEspectaculos, listaFechas, listaPrecios, listaStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+        elif opcion == 8:
+            GuardarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+        elif opcion == 9:
+            CargarBackupJSONL(listaEspectaculos, listaFechas, listaPrecios, listaStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
+        else:
+            print("Terminando programa...")
+            terminar = True
+
+
+try:
+    Programa()
+except (EOFError, KeyboardInterrupt):
+    print("\nTerminando programa...")

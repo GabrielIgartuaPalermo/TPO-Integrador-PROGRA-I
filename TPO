@@ -558,29 +558,29 @@ def GuardarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPr
 def CargarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, zonas):
     '''Lee 'backup_sistema.jsonl' linea por linea para evitar cargar un bloque gigante en memoria'''
     try:
-        for clave in list(diccionarioEspectaculos.keys()):
-            del diccionarioEspectaculos[clave]
-        for clave in list(diccionarioFechas.keys()):
-            del diccionarioFechas[clave]
-        for clave in list(diccionarioPrecios.keys()):
-            del diccionarioPrecios[clave]
-        for clave in list(diccionarioStock.keys()):
-            del diccionarioStock[clave]
-        while len(listaClientes) > 0:
-            del listaClientes[0]
-        while len(listaCompras) > 0:
-            del listaCompras[0]
-        while len(listaCantidades) > 0:
-            del listaCantidades[0]
-        while len(listaZonas) > 0:
-            del listaZonas[0]
-        while len(listaZonasClaves) > 0:
-            del listaZonasClaves[0]
-        while len(listaTotales) > 0:
-            del listaTotales[0]
-
         lineas_corruptas = 0
         with open("backup_sistema.jsonl", "r", encoding="utf-8") as archivo:
+            for clave in list(diccionarioEspectaculos.keys()):
+                del diccionarioEspectaculos[clave]
+            for clave in list(diccionarioFechas.keys()):
+                del diccionarioFechas[clave]
+            for clave in list(diccionarioPrecios.keys()):
+                del diccionarioPrecios[clave]
+            for clave in list(diccionarioStock.keys()):
+                del diccionarioStock[clave]
+            while len(listaClientes) > 0:
+                del listaClientes[0]
+            while len(listaCompras) > 0:
+                del listaCompras[0]
+            while len(listaCantidades) > 0:
+                del listaCantidades[0]
+            while len(listaZonas) > 0:
+                del listaZonas[0]
+            while len(listaZonasClaves) > 0:
+                del listaZonasClaves[0]
+            while len(listaTotales) > 0:
+                del listaTotales[0]
+
             for linea in archivo:
                 texto = linea.strip()
                 if texto == "":
@@ -671,6 +671,7 @@ def Programa():
         elif opcion == 4:
             ModificarEspectaculo(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaCompras, zonas)
             GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 5:
             VenderEntradas(diccionarioEspectaculos, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, diccionarioFechas, zonas)
             GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
@@ -685,6 +686,8 @@ def Programa():
             GuardarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         elif opcion == 9:
             CargarBackupJSONL(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock, listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales, zonas)
+            GuardarEspectaculos(diccionarioEspectaculos, diccionarioFechas, diccionarioPrecios, diccionarioStock)
+            GuardarClientes(listaClientes, listaCompras, listaCantidades, listaZonas, listaZonasClaves, listaTotales)
         else:
             print("Terminando programa...")
             terminar = True
